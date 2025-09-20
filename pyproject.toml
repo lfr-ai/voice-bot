@@ -1,0 +1,64 @@
+[project]
+name = "voice"
+version = "0.1.0"
+description = "This code contains the cod for the development, implementation and execution of the primary voice product of TIK"
+authors = [
+    {name = "Laurits Fromberg", email = ""},
+]
+dependencies = [
+        "fastapi>=0.116.1",
+        "uvicorn>=0.35.0",
+        "openai>=1.101.0",
+        "keyboard>=0.13.5",
+        "pyaudiowpatch>=0.2.12.7",
+        "websockets>=15.0.1",
+        "python-dotenv>=1.1.1",
+        "tiktoken>=0.11.0"
+]
+
+requires-python = "==3.13.*"
+readme = "README.md"
+license = {text = "MIT"}
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.3.0",
+    "pytest>=8.4.1",
+    "flake8>=7.3.0",
+    "mypy>=1.17.1",
+    "flake8-pyproject>=1.2.3",
+    "bandit>=1.8.6",
+    "black>=25.1.0",
+    "isort>=6.0.1",
+    "pyinstaller>=6.15.0",
+    "commitizen>=4.8.3",
+    "xenon>=0.9.3",
+]
+
+[tool.pdm]
+distribution = false
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.1.0"
+version_files = ["pyproject.toml"]
+
+[tool.bandit]
+exclude_dirs = [".venv", "tests"]
+skips = ["B614"]
+
+[tool.flake8]
+max-line-length = 88
+ignore = ["E203", "W503"]
+exclude = [".venv"]
+
+[tool.mypy]
+ignore_missing_imports = true
+disable_error_code = ["attr-defined"]
+check_untyped_defs = true
+
+[tool.isort]
+profile = "black"
+
+
+
