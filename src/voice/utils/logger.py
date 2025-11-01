@@ -10,7 +10,7 @@ class Logger:
     @staticmethod
     def create(name: str, filename: Path | str) -> logging.Logger:
         """
-        Create a logger with the specified name, writing to the specified file.
+        Create a logger with a specified name, writing to a specific file.
 
         Args:
             name (str): Name of the logger.

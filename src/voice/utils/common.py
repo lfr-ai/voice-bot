@@ -7,7 +7,7 @@ cfg = Config()
 
 def _validate_file_path(dir_path: Path, filename: str, suffix: str) -> Path:
     """
-    Validate and return the path to a file.
+    Validate and return a path to a file.
 
     Args:
         dir_path (Path): Path to the directory of the file.
@@ -19,7 +19,7 @@ def _validate_file_path(dir_path: Path, filename: str, suffix: str) -> Path:
     """
     path = dir_path / filename
     if not path.is_file():
-        raise FileNotFoundError(f"File '{filename}' not found in '{dir_path}'.")
+        raise FileNotFoundError(f"File '{filename}' not found in '{str(dir_path)}'.")
     elif path.suffix != suffix:
         raise ValueError(f"File '{filename}' must have a '{suffix}' extension.")
     return path

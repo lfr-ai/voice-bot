@@ -31,7 +31,7 @@ class OpenAIClient:
         model: str,
         temperature: float,
         max_completion_tokens: int,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> str:
         """
         Send a chat request to OpenAI and return the assistant's response.
@@ -46,13 +46,13 @@ class OpenAIClient:
         """
         messages = [
             {"role": "system", "content": [{"type": "text", "text": system_prompt}]},
-            {"role": " user", "content": [{"type": "text", "text": user_prompt}]},
+            {"role": "user", "content": [{"type": "text", "text": user_prompt}]},
         ]
         response = self.client.chat.completions.create(
             model=model,
             messages=messages,
             temperature=temperature,
             max_completion_tokens=max_completion_tokens,
-            **kwargs
+            **kwargs,
         )
         return response.choices[0].message.content
