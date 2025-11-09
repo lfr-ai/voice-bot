@@ -12,7 +12,7 @@ from voice.managers.queue_manager import QueueManager
 from voice.models.audio_streamer.audio_streamer_controller import (
     AudioStreamerController,
 )
-from voice.models.transcriber.transcriber import FasterWhisperSTT
+from voice.models.transcribers.transcriber import FasterWhisperSTT
 from voice.utils.logger import Logger
 
 cfg = Config()
