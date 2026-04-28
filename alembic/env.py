@@ -13,9 +13,15 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import create_async_engine
 
+# ruff: noqa: I001
+
+
+
+# isort: off
 from alembic import context
 from voice.config.settings import get_settings
 from voice.infrastructure.db import Base
+# isort: on
 
 # Alembic config and logging
 config = context.config

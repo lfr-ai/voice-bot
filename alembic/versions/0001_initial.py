@@ -5,9 +5,13 @@ Revises:
 Create Date: 2026-04-28 00:00:00.000000
 """
 
+# ruff: noqa: I001
+
 import sqlalchemy as sa
 
+# isort: off
 from alembic import op
+# isort: on
 
 # revision identifiers, used by Alembic.
 revision = "000000000001"
