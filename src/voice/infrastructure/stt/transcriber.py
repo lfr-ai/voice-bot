@@ -13,13 +13,10 @@ from voice.utils.logger import Logger
 if TYPE_CHECKING:
     from numpy import ndarray
 
-_np = None
 try:
-    import numpy as _np  # type: ignore
+    import numpy as np
 except Exception:  # pragma: no cover - optional runtime dependency
-    _np = None
-
-np: Any = _np
+    np = None
 
 # faster-whisper is an optional runtime dependency; import only when available.
 try:
