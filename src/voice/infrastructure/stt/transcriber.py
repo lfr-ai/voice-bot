@@ -13,7 +13,7 @@ from voice.utils.logger import Logger
 if TYPE_CHECKING:
     from numpy import ndarray
 
-_np: Any = None
+_np = None
 try:
     import numpy as _np  # type: ignore
 except Exception:  # pragma: no cover - optional runtime dependency

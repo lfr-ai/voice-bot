@@ -77,54 +77,57 @@ class Config:
         if APP_SETTINGS is None:
             return
 
-        # Map well-known, overlapping settings where present in AppSettings
+        # Map well-known, overlapping settings where present in AppSettings.
+        # Break mapping into small helpers to keep individual method
+        # complexity low (helps static analysis tools like xenon).
         try:
-            self.HOST = getattr(APP_SETTINGS, "host", self.HOST)
-            self.PORT = getattr(APP_SETTINGS, "port", self.PORT)
-            # logs_dir_path in AppSettings may be a Path already
-            self.LOGS_DIR_PATH = Path(getattr(APP_SETTINGS, "logs_dir_path", self.LOGS_DIR_PATH))
-            # Project path mappings
-            self.ROOT_DIR_PATH = Path(getattr(APP_SETTINGS, "root_dir_path", self.ROOT_DIR_PATH))
-            self.SRC_DIR_PATH = Path(getattr(APP_SETTINGS, "src_dir_path", self.SRC_DIR_PATH))
-            self.PACKAGE_DIR_PATH = Path(getattr(APP_SETTINGS, "package_dir_path", self.PACKAGE_DIR_PATH))
-            self.PROMPT_DIR_PATH = Path(getattr(APP_SETTINGS, "prompt_dir_path", self.PROMPT_DIR_PATH))
-            self.INTERACTION_DIR_PATH = Path(
-                getattr(APP_SETTINGS, "interaction_dir_path", self.INTERACTION_DIR_PATH)
-            )
-            # Audio/IPC mappings
-            self.AUDIO_STREAMER_TCP_PORT = getattr(
-                APP_SETTINGS, "audio_streamer_tcp_port", self.AUDIO_STREAMER_TCP_PORT
-            )
-            self.AUDIO_FRAMES_PER_BUFFER = getattr(
-                APP_SETTINGS, "audio_frames_per_buffer", self.AUDIO_FRAMES_PER_BUFFER
-            )
-            # AUDIO_CHANNELS may not be defined previously; be forgiving
-            try:
-                self.AUDIO_CHANNELS = getattr(APP_SETTINGS, "audio_channels", getattr(self, "AUDIO_CHANNELS", 2))
-            except Exception:
-                # fallback if attribute access fails
-                self.AUDIO_CHANNELS = getattr(self, "AUDIO_CHANNELS", 2)
+            self._apply_network_settings(APP_SETTINGS)
+            self._apply_path_mappings(APP_SETTINGS)
+            self._apply_audio_settings(APP_SETTINGS)
+            self._apply_openai_settings(APP_SETTINGS)
         except (AttributeError, TypeError):
             # Be forgiving: do not raise if Settings are missing or malformed
             pass
 
-        # OpenAI key may be a SecretStr in AppSettings; convert to plain str when present
-        try:
-            api_key = getattr(APP_SETTINGS, "openai_api_key", None)
-            if api_key is not None:
-                if hasattr(api_key, "get_secret_value"):
-                    self.OPENAI_KEY = api_key.get_secret_value()
-                else:
-                    self.OPENAI_KEY = str(api_key)
-        except (AttributeError, TypeError):
-            # Non-fatal: missing or unexpected attribute types are tolerated
-            pass
+    def _apply_network_settings(self, app_settings: object) -> None:
+        """Apply simple network-related overrides from AppSettings."""
 
-        # Azure/OpenAI API version mapping (if provided)
-        try:
-            version = getattr(APP_SETTINGS, "azure_openai_version", None)
-            if version:
-                self.OPENAI_VERSION = version
-        except (AttributeError, TypeError):
-            # Non-fatal: missing or unexpected attribute types are tolerated
-            pass
+        self.HOST = getattr(app_settings, "host", self.HOST)
+        self.PORT = getattr(app_settings, "port", self.PORT)
+
+    def _apply_path_mappings(self, app_settings: object) -> None:
+        """Apply project path mappings from AppSettings when present."""
+
+        self.LOGS_DIR_PATH = Path(getattr(app_settings, "logs_dir_path", self.LOGS_DIR_PATH))
+        self.ROOT_DIR_PATH = Path(getattr(app_settings, "root_dir_path", self.ROOT_DIR_PATH))
+        self.SRC_DIR_PATH = Path(getattr(app_settings, "src_dir_path", self.SRC_DIR_PATH))
+        self.PACKAGE_DIR_PATH = Path(getattr(app_settings, "package_dir_path", self.PACKAGE_DIR_PATH))
+        self.PROMPT_DIR_PATH = Path(getattr(app_settings, "prompt_dir_path", self.PROMPT_DIR_PATH))
+        self.INTERACTION_DIR_PATH = Path(getattr(app_settings, "interaction_dir_path", self.INTERACTION_DIR_PATH))
+
+    def _apply_audio_settings(self, app_settings: object) -> None:
+        """Apply audio-related overrides from AppSettings."""
+
+        self.AUDIO_STREAMER_TCP_PORT = int(
+            getattr(app_settings, "audio_streamer_tcp_port", self.AUDIO_STREAMER_TCP_PORT)
+        )
+        self.AUDIO_FRAMES_PER_BUFFER = int(
+            getattr(app_settings, "audio_frames_per_buffer", self.AUDIO_FRAMES_PER_BUFFER)
+        )
+        self.AUDIO_CHANNELS = int(
+            getattr(app_settings, "audio_channels", getattr(self, "AUDIO_CHANNELS", 2))
+        )
+
+    def _apply_openai_settings(self, app_settings: object) -> None:
+        """Apply OpenAI-related settings (keys, versions) from AppSettings."""
+
+        api_key = getattr(app_settings, "openai_api_key", None)
+        if api_key is not None:
+            if hasattr(api_key, "get_secret_value"):
+                self.OPENAI_KEY = api_key.get_secret_value()
+            else:
+                self.OPENAI_KEY = str(api_key)
+
+        version = getattr(app_settings, "azure_openai_version", None)
+        if version:
+            self.OPENAI_VERSION = version
