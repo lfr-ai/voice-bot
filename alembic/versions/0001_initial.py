@@ -1,11 +1,12 @@
 """initial migration
 
 Revision ID: 000000000001
-Revises: 
+Revises:
 Create Date: 2026-04-28 00:00:00.000000
 """
-from alembic import op
 import sqlalchemy as sa
+
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '000000000001'

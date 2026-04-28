@@ -9,7 +9,6 @@ from __future__ import annotations
 
 from voice.infrastructure.llm.chat_adapter import ChatModelAdapter
 
-
 # Provide the historical name for backwards compatibility
 LangChainOpenAIAdapter = ChatModelAdapter
 

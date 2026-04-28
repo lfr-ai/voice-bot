@@ -54,3 +54,48 @@ class Config:
     SLEEP_DELAY_SECONDS: float = 0.1
     WAIT_TIMEOUT_SECONDS: int = 2
     MAX_READ_BYTES: int = 100
+
+    def __post_init__(self) -> None:
+        """Populate/override values from the canonical AppSettings `SETTINGS`.
+
+        This provides a backwards-compatible bridge so existing call sites
+        that instantiate :class:`Config` continue to work while the codebase
+        migrates to the new :mod:`voice.config.settings` usage.
+        """
+        try:
+            # Import lazily to avoid import-time cycles during module import.
+            from voice.config.settings import SETTINGS as APP_SETTINGS
+        except Exception:
+            APP_SETTINGS = None
+
+        if not APP_SETTINGS:
+            return
+
+        # Map well-known, overlapping settings where present in AppSettings
+        try:
+            self.HOST = getattr(APP_SETTINGS, "host", self.HOST)
+            self.PORT = getattr(APP_SETTINGS, "port", self.PORT)
+            # logs_dir_path in AppSettings may be a Path already
+            self.LOGS_DIR_PATH = Path(getattr(APP_SETTINGS, "logs_dir_path", self.LOGS_DIR_PATH))
+        except Exception:
+            # Be forgiving: do not raise if Settings are missing or malformed
+            pass
+
+        # OpenAI key may be a SecretStr in AppSettings; convert to plain str when present
+        try:
+            api_key = getattr(APP_SETTINGS, "openai_api_key", None)
+            if api_key is not None:
+                if hasattr(api_key, "get_secret_value"):
+                    self.OPENAI_KEY = api_key.get_secret_value()
+                else:
+                    self.OPENAI_KEY = str(api_key)
+        except Exception:
+            pass
+
+        # Azure/OpenAI API version mapping (if provided)
+        try:
+            version = getattr(APP_SETTINGS, "azure_openai_version", None)
+            if version:
+                self.OPENAI_VERSION = version
+        except Exception:
+            pass

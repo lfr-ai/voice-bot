@@ -7,7 +7,6 @@ from sqlalchemy.orm import sessionmaker
 
 from voice.config.settings import SETTINGS
 
-
 _engine = create_engine(SETTINGS.get_database_url(), future=True)
 
 SessionLocal = sessionmaker(bind=_engine, autoflush=False, autocommit=False)

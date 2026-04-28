@@ -14,10 +14,12 @@ from langchain.chat_models import init_chat_model
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 
-from voice.core.protocols import ChatPort
 from voice.config.settings import AppSettings, get_settings
 from voice.core.enums import LLMProvider
-from voice.infrastructure.helpers.retry import api_retry  # create a small retry helper below
+from voice.core.protocols import ChatPort
+from voice.infrastructure.helpers.retry import (
+    api_retry,  # create a small retry helper below
+)
 
 if TYPE_CHECKING:
     from voice.config.settings import AppSettings as SettingsType
