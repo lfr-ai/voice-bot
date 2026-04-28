@@ -1,0 +1,21 @@
+name: voice
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Containerfile
+    init: true
+    env_file:
+      - path: ../.env
+        required: false
+      - path: ../.env.local
+        required: false
+    environment:
+      VOICE_HOST: 0.0.0.0
+      VOICE_PORT: 8000
+    networks:
+      - backend
+
+networks:
+  backend:

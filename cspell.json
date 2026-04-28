@@ -1,0 +1,18 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "ignorePaths": [
+    "pdm.lock",
+    ".venv/**",
+    "node_modules/**",
+    "build/**",
+    "dist/**"
+  ],
+  "words": [
+    "audiowpatch",
+    "fastapi",
+    "uvicorn",
+    "tiktoken",
+    "websockets"
+  ]
+}

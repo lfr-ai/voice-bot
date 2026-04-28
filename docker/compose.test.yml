@@ -1,0 +1,10 @@
+services:
+  app:
+    env_file:
+      - path: ../.env
+        required: false
+      - path: ../.env.test
+        required: false
+    environment:
+      VOICE_ENVIRONMENT: test
+    command: ["pdm", "run", "pytest", "-q"]

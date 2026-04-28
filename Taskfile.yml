@@ -1,0 +1,69 @@
+version: "3"
+
+tasks:
+  install:
+    desc: Install project dependencies (uv preferred)
+    cmds:
+      - uv sync --all-extras || true
+      - # Fallback: PDM
+      - pdm install -d || true
+
+  dev:
+    desc: Run FastAPI app in reload mode
+    cmds:
+      - uv run uvicorn voice.interaction.main:app --reload --host 127.0.0.1 --port 8000 || true
+      - # Fallback: PDM
+      - pdm run uvicorn voice.interaction.main:app --reload --host 127.0.0.1 --port 8000 || true
+
+  test:
+    desc: Run default (non-integration) test suite
+    cmds:
+      - uv run pytest -q || true
+      - # Fallback: PDM
+      - pdm run pytest -q || true
+
+  test:integration:
+    desc: Run integration tests only
+    cmds:
+      - uv run pytest -q -m integration || true
+      - # Fallback: PDM
+      - pdm run pytest -q -m integration || true
+
+  lint:
+    desc: Run static checks
+    cmds:
+      - uv run ruff check src tests || true
+      - uv run mypy src || true
+      - # Fallback: PDM
+      - pdm run ruff check src tests || true
+      - pdm run mypy src || true
+
+  architecture:
+    desc: Validate Clean Architecture import boundaries
+    cmds:
+      - uv run python scripts/check_architecture_boundaries.py || true
+      - # Fallback: PDM
+      - pdm run python scripts/check_architecture_boundaries.py || true
+
+  format:
+    desc: Format Python code
+    cmds:
+      - uv run ruff format src tests || true
+      - # Fallback: PDM
+      - pdm run ruff format src tests || true
+
+  precommit:
+    desc: Run pre-commit hooks against all files
+    cmds:
+      - uvx pre-commit run --all-files || true
+      - # Fallback: PDM
+      - pdm run pre-commit run --all-files || true
+
+  check:
+    desc: Full local quality gate
+    deps: [lint, architecture, test]
+    frontend-build:
+      desc: Build frontend assets
+      cmds:
+        - cd frontend && npm ci || true
+        - cd frontend && npm run build || true

@@ -1,8 +1,11 @@
 import asyncio
+import logging
 from asyncio import Event, StreamReader, StreamWriter
 
 from voice.config.config import Config
 from voice.models.audio_streamer.audio_streamer import AudioStreamer
+
+logger = logging.getLogger(__name__)
 
 
 async def _ipc_handler(
@@ -27,10 +30,7 @@ async def _ipc_handler(
                 audio_streamer.start_stream()
                 # Establish connections to main app's audio servers and start sending
                 # System audio
-                if (
-                    audio_streamer.sys_sending_task is None
-                    or audio_streamer.sys_sending_task.done()
-                ):
+                if audio_streamer.sys_sending_task is None or audio_streamer.sys_sending_task.done():
                     try:
                         sys_r, sys_w = await asyncio.open_connection(
                             audio_streamer.cfg.HOST,
@@ -48,8 +48,8 @@ async def _ipc_handler(
                                         break
                                     writer_sock.write(data)
                                     await writer_sock.drain()
-                            except Exception:
-                                pass
+                            except Exception as e:
+                                logger.debug("Error while sending sys audio: %s", e)
                             finally:
                                 writer_sock.close()
                                 await writer_sock.wait_closed()
@@ -60,10 +60,7 @@ async def _ipc_handler(
                     except Exception as e:
                         print(f"[Streamer] Failed to connect for sys audio: {e}")
                 # Microphone audio
-                if (
-                    audio_streamer.mic_sending_task is None
-                    or audio_streamer.mic_sending_task.done()
-                ):
+                if audio_streamer.mic_sending_task is None or audio_streamer.mic_sending_task.done():
                     try:
                         mic_r, mic_w = await asyncio.open_connection(
                             audio_streamer.cfg.HOST,
@@ -81,8 +78,8 @@ async def _ipc_handler(
                                         break
                                     writer_sock.write(data)
                                     await writer_sock.drain()
-                            except Exception:
-                                pass
+                            except Exception as e:
+                                logger.debug("Error while sending mic audio: %s", e)
                             finally:
                                 writer_sock.close()
                                 await writer_sock.wait_closed()
@@ -110,14 +107,15 @@ async def _ipc_handler(
         writer.close()
         await writer.wait_closed()
 
-    except Exception:
+    except Exception as e:
+        logger.exception("Unhandled exception in IPC handler: %s", e)
         try:
             writer.write(b"error")
             await writer.drain()
             writer.close()
             await writer.wait_closed()
-        except Exception:
-            pass
+        except Exception as e2:
+            logger.debug("Failed to close writer after error: %s", e2)
 
 
 async def main():

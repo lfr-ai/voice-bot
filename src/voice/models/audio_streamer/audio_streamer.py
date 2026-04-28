@@ -1,11 +1,11 @@
 import asyncio
-from typing import Any
+from typing import Any, Optional
 
 import pyaudiowpatch as pyaudio
 from pyaudiowpatch import Stream
 
 from voice.config.config import Config
-from voice.utils.types import RecognitionMode
+from voice.utils.types_ import RecognitionMode
 
 
 class AudioStreamer:
@@ -15,8 +15,11 @@ class AudioStreamer:
         self.cfg = cfg
         self.running = False
         self.sending = False
-        self.group = None
-        self.p = None
+        self.group: Optional[asyncio.TaskGroup] = None
+        from typing import Any
+
+        # PyAudio instance (lazy-created in _initialize)
+        self.p: Any = None
         # Track send tasks for subprocess-to-main streaming
         self.sys_sending_task: asyncio.Task | None = None
         self.mic_sending_task: asyncio.Task | None = None
@@ -54,9 +57,7 @@ class AudioStreamer:
         try:
             while self.running:
                 if self.sending:
-                    data = await asyncio.to_thread(
-                        stream.read, self.cfg.AUDIO_FRAMES_PER_BUFFER
-                    )
+                    data = await asyncio.to_thread(stream.read, self.cfg.AUDIO_FRAMES_PER_BUFFER)
                     await queue.put(data)
                 else:
                     await asyncio.sleep(self.cfg.SLEEP_DELAY_SECONDS)
@@ -66,23 +67,32 @@ class AudioStreamer:
             print(f"Error in _stream_audio: {e}")
 
     def _initialize(self):
+        # create a TaskGroup instance; we'll enter it in async start()
         self.group = asyncio.TaskGroup()
         self.p = pyaudio.PyAudio()
         self._create_sys_stream()
         self._create_mic_stream()
 
     async def start(
-        self, sys_queue: asyncio.Queue = None, mic_queue: asyncio.Queue = None
+        self,
+        sys_queue: Optional[asyncio.Queue] = None,
+        mic_queue: Optional[asyncio.Queue] = None,
     ):
         """Start streamer tasks (opens devices)."""
         self._initialize()
-        await self.group.__aenter__()
+        # Enter the TaskGroup context explicitly. Use a local variable to
+        # convince type checkers that it's non-None.
+        group = self.group
+        if group is None:
+            raise RuntimeError("Failed to create TaskGroup")
+        assert group is not None
+        await group.__aenter__()
         self.running = True
         # We do not create queue tasks here since streaming is sent via TCP
-        if sys_queue:
-            self.group.create_task(self._stream_audio(self.stream_sys, sys_queue))
-        if mic_queue:
-            self.group.create_task(self._stream_audio(self.stream_mic, mic_queue))
+        if sys_queue is not None:
+            group.create_task(self._stream_audio(self.stream_sys, sys_queue))
+        if mic_queue is not None:
+            group.create_task(self._stream_audio(self.stream_mic, mic_queue))
 
     def start_stream(self):
         """Begin sending audio frames (subprocess only)."""
@@ -100,12 +110,12 @@ class AudioStreamer:
 
     async def _cleanup(self):
         group = getattr(self, "group", None)
-        if group:
-            for task in list(group._tasks):
+        if group is not None:
+            for task in list(getattr(group, "_tasks", [])):
                 task.cancel()
             try:
                 await group.__aexit__(None, None, None)
-            except* Exception as e:
+            except Exception as e:
                 print(f"Error while stopping AudioStreamer: {e}")
         for stream_attr in ("stream_sys", "stream_mic"):
             stream = getattr(self, stream_attr, None)

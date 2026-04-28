@@ -1,11 +1,12 @@
 {
 	"folders": [
 		{
-			"path": "C:\\Users\\Bruger\\Documents\\tik\\voice"
+			"path": ".."
 		}
 	],
-	"settings": {"terminal.integrated.env.windows": {
-      "PYTHONPATH": "src"
-    }
-}
+	"settings": {
+		"terminal.integrated.env.windows": {
+			"PYTHONPATH": "src"
+		}
+	}
 }

@@ -1,0 +1,16 @@
+services:
+  app:
+    ports:
+      - "${VOICE_PORT:-8000}:8000"
+      - "${AUDIO_STREAMER_PORT:-5050}:5050"
+    env_file:
+      - path: ../.env
+        required: false
+      - path: ../.env.local
+        required: false
+    volumes:
+      - ../src:/app/src
+      - ../logs:/app/logs
+    environment:
+      VOICE_ENVIRONMENT: dev
+    command: ["pdm", "run", "uvicorn", "voice.interaction.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

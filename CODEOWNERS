@@ -1,0 +1,4 @@
+# Code owners: prefer placing at repository root so GitHub and tools find it by default.
+*    @your-org/your-team
+* @lfr-team
+* @your-github-username

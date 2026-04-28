@@ -1,0 +1,20 @@
+FROM mcr.microsoft.com/devcontainers/python:1-3.11
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+  build-essential \
+  ca-certificates \
+  curl \
+  git \
+  jq \
+  zsh \
+  shellcheck \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN python -m pip install --upgrade pip && pip install uv pre-commit
+
+RUN chsh -s /usr/bin/zsh vscode || true
+
+WORKDIR /workspace

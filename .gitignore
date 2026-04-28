@@ -1,3 +1,17 @@
+__pycache__/
+.venv/
+venv/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+__pypackages__/
+.pytest_cache/
+*.pyc
+.env
+.env.local
+/.vscode/
+.DS_Store
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -161,11 +175,8 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-# PDM specific files
-pdm.lock
-
-# PDM cache
-.pdm/.cache
+# uv package manager lock (uv.lock) should be committed for reproducible builds
+# Keep uv.lock in the repository; do not ignore it here.
 
 # Ignore Terraform files
 .terraform/

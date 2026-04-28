@@ -1,58 +1,19 @@
-# type: ignore
-from typing import Any
+"""Compatibility wrapper for the OpenAI client.
 
-from openai import AzureOpenAI
+This module kept for backwards compatibility; prefer using the
+infrastructure adapter at `voice.infrastructure.openai.openai_client.AzureOpenAIClient`
+and the application service `voice.application.services.chat_service.ChatService`.
+"""
 
 from voice.config.config import Config
+from voice.infrastructure.openai.openai_client import AzureOpenAIClient
 
 
-class OpenAIClient:
+def create_client(cfg: Config = None):
+    """Create an AzureOpenAIClient instance.
+
+    Kept as a convenience factory for older call sites.
     """
-    Client for interacting with the OpenAI API.
-    """
-
-    def __init__(self, cfg: Config):
-        """
-        Initialize the OpenAIClient.
-
-        Args:
-            cfg (Config): Configuration object containing settings.
-        """
-        self.client = AzureOpenAI(
-            api_key=cfg.OPENAI_KEY,
-            api_version=cfg.OPENAI_VERSION,
-            azure_endpoint=cfg.OPENAI_ENDPOINT,
-        )
-
-    def chat(
-        self,
-        system_prompt: str,
-        user_prompt: str,
-        model: str,
-        temperature: float,
-        max_completion_tokens: int,
-        **kwargs: Any,
-    ) -> str:
-        """
-        Send a chat request to OpenAI and return the assistant's response.
-
-        Args:
-            system_prompt (str): Prompt defining assistant behavior.
-            user_prompt (str): User's prompt to the assistant.
-            model (str): Name of the OpenAI model.
-            temperature (float): Sampling temperature for the response variability.
-            max_completion_tokens (int): Maximum number of tokens in the response.
-            **kwargs (Any): Optional keyword arguments passed to the chat request.
-        """
-        messages = [
-            {"role": "system", "content": [{"type": "text", "text": system_prompt}]},
-            {"role": "user", "content": [{"type": "text", "text": user_prompt}]},
-        ]
-        response = self.client.chat.completions.create(
-            model=model,
-            messages=messages,
-            temperature=temperature,
-            max_completion_tokens=max_completion_tokens,
-            **kwargs,
-        )
-        return response.choices[0].message.content
+    if cfg is None:
+        cfg = Config()
+    return AzureOpenAIClient(cfg)

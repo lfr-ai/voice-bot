@@ -1,0 +1,18 @@
+[default]
+locale = "en-us"
+
+[default.extend-words]
+uvicorn = "uvicorn"
+fastapi = "fastapi"
+tiktoken = "tiktoken"
+
+[files]
+extend-exclude = [
+  "pdm.lock",
+  "*.lock",
+  "*.egg-info/**",
+  "*.baseline",
+  "logs/**",
+  "htmlcov/**",
+  "**/prompts/**",
+]

@@ -1,0 +1,19 @@
+name: voice-dev
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Containerfile.dev
+    volumes:
+      - ..:/workspace:cached
+    command: sleep infinity
+    init: true
+    env_file:
+      - path: ../.env
+        required: false
+      - path: ../.env.local
+        required: false
+    environment:
+      VOICE_ENVIRONMENT: local
+      VOICE_HOST: 0.0.0.0

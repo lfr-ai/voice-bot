@@ -1,0 +1,8 @@
+fastapi>=0.95
+uvicorn[standard]>=0.23
+pytest>=7.0
+flake8>=6.0
+mypy>=1.5
+pre-commit
+psycopg2-binary
+redis

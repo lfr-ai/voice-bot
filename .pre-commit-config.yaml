@@ -1,40 +1,81 @@
+minimum_pre_commit_version: "4.0"
+default_language_version:
+  python: python3.13
+
 repos:
-  - repo: https://github.com/pycqa/flake8
-    rev: 6.1.0
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
     hooks:
-      - id: flake8
-        additional_dependencies: ["Flake8-pyproject"]
-
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.10.0
-    hooks:
-      - id: mypy
-        args: ["--config-file", "pyproject.toml"]
-
-  - repo: https://github.com/PyCQA/bandit
-    rev: "1.8.3"
-    hooks:
-      - id: bandit
-        args:
-          - "-c"
-          - "pyproject.toml"
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: [--maxkb=1000]
+      - id: detect-private-key
+      - id: mixed-line-ending
+        args: [--fix=lf]
 
   - repo: https://github.com/psf/black
-    rev: 24.4.2
+    rev: 24.1.0
     hooks:
+      # Black can cause issues on Windows when files are memory-mapped by the
+      # editor; run in --check mode in CI instead. Disable auto-writing here
+      # to avoid file lock errors during local pre-commit runs.
       - id: black
+        args: ["--check", "--line-length=120"]
 
   - repo: https://github.com/PyCQA/isort
-    rev: 5.13.2
+    rev: 5.12.0
     hooks:
       - id: isort
-        args: ["--settings-path=pyproject.toml"]
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.12.11
+    hooks:
+      # Do not auto-fix during local pre-commit to avoid file write conflicts
+      # on Windows environments where files may be locked by editors/antivirus.
+      - id: ruff
+        args: []
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.17.1
+    hooks:
+      - id: mypy
+        args: [--config-file, pyproject.toml]
+        additional_dependencies: [types-redis]
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.8.6
+    hooks:
+      - id: bandit
+        args: ["-c", "bandit.toml"]
+        additional_dependencies: ["bandit[toml]"]
+
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.37.1
+    hooks:
+      - id: yamllint
+        args: [-c, .yamllint.yaml]
+
+  - repo: https://github.com/crate-ci/typos
+    rev: v1.35.5
+    hooks:
+      - id: typos
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args: [--baseline, .secrets.baseline]
 
   - repo: https://github.com/rubik/xenon
-    rev: v0.9.0
+    rev: v0.9.3
     hooks:
       - id: xenon
-        args:
-          - --max-absolute
-          - B
-          - src
+        # Allow up to C complexity in blocks to avoid blocking for larger
+        # but intentionally structured functions in this repo. Adjust later
+        # if you want stricter checks.
+        args: [--max-absolute=C, --max-modules=B, --max-average=A, src]

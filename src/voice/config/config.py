@@ -28,9 +28,7 @@ class Config:
     LOGS_DIR_PATH: Path = ROOT_DIR_PATH / "logs"
     PROMPT_DIR_PATH: Path = PACKAGE_DIR_PATH / "prompts"
     INTERACTION_DIR_PATH: Path = PACKAGE_DIR_PATH / "interaction"
-    AUDIO_STREAMER_TCP_SERVER_MODULE_PATH: str = (
-        "voice.models.audio_streamer.audio_streamer_tcp_server"
-    )
+    AUDIO_STREAMER_TCP_SERVER_MODULE_PATH: str = "voice.models.audio_streamer.audio_streamer_tcp_server"
 
     # Server settings
     HOST: str = "127.0.0.1"

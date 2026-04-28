@@ -1,0 +1,12 @@
+[
+  "ms-python.python",
+  "ms-python.vscode-pylance",
+  "charliermarsh.ruff",
+  "ms-azuretools.vscode-docker",
+  "redhat.vscode-yaml",
+  "tamasfe.even-better-toml",
+  "editorconfig.editorconfig",
+  "DavidAnson.vscode-markdownlint",
+  "streetsidesoftware.code-spell-checker",
+  "github.copilot-chat"
+]

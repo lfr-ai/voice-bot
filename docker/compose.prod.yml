@@ -1,0 +1,12 @@
+services:
+  app:
+    restart: unless-stopped
+    ports:
+      - "${VOICE_PORT:-8000}:8000"
+    env_file:
+      - path: ../.env
+        required: false
+      - path: ../.env.prod
+        required: false
+    environment:
+      VOICE_ENVIRONMENT: prod
