@@ -1,0 +1,15 @@
+respond_to_query:
+  description: >
+    Respond to the user's voice query: "{query}"
+    Use the conversation context to provide a relevant and helpful answer.
+  expected_output: "A concise, natural-language response suitable for voice delivery."
+  agent: voice_assistant
+
+analyze_transcript:
+  description: >
+    Analyze the following conversation transcript and extract key insights:
+    {transcript}
+  expected_output: >
+    A structured summary containing: key topics discussed, overall sentiment,
+    action items identified, and any follow-up questions that should be addressed.
+  agent: transcript_analyzer

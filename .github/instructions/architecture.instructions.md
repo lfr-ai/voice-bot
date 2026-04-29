@@ -1,6 +1,6 @@
 ---
 description: Clean Architecture boundaries for Python source files
-applyTo: "src/voice/**/*.py"
+applyTo: "src/ekko/**/*.py"
 ---
 
 # Architecture Instructions

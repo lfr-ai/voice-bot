@@ -8,7 +8,6 @@ class TestImportPerformance:
         """Settings module should import within a reasonable time."""
 
         def import_settings():
-            import voice.config.settings
 
             importlib.reload(voice.config.settings)
 
@@ -18,7 +17,6 @@ class TestImportPerformance:
         """Enums module should import within a reasonable time."""
 
         def import_enums():
-            import voice.core.enums
 
             importlib.reload(voice.core.enums)
 

@@ -1,6 +1,6 @@
 """Tests for core enums."""
 
-from voice.core.enums import (
+from ekko.core.enums import (
     AudioFormat,
     DeploymentTarget,
     Environment,

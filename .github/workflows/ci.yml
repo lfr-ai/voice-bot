@@ -71,11 +71,11 @@ jobs:
 
       - name: Check core layer has no outward imports
         run: |
-          if rg "from\s+voice\.(application|infrastructure|presentation|config|interaction|models|managers)" src/voice/core -n --hidden; then
+          if rg "from\s+ekko\.(application|infrastructure|presentation|config|interaction|models|managers)" src/ekko/core -n --hidden; then
             echo "::error::Found outward imports from core layer. Fix imports to follow Clean Architecture.";
             exit 1;
           fi
-          if rg "from\s+voice\.infrastructure" src/voice/application -n --hidden; then
+          if rg "from\s+ekko\.infrastructure" src/ekko/application -n --hidden; then
             echo "::error::Found direct infrastructure imports in application layer. Use protocols from core.";
             exit 1;
           fi

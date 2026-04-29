@@ -31,7 +31,7 @@ tasks:
   dev:backend:
     desc: Run FastAPI app in reload mode
     cmds:
-      - uv run uvicorn voice.interaction.main:app --reload --host 127.0.0.1 --port 8000
+      - uv run uvicorn ekko.composition.app_factory:create_app --factory --reload --host 127.0.0.1 --port 8000
 
   dev:frontend:
     desc: Run frontend dev server
@@ -72,7 +72,7 @@ tasks:
   test:coverage:
     desc: Run tests with coverage report
     cmds:
-      - uv run pytest tests/ --cov=src/voice --cov-report=term-missing --cov-report=html
+      - uv run pytest tests/ --cov=src/ekko --cov-report=term-missing --cov-report=html
 
   # ── Linting ──────────────────────────────────────────────────
   lint:
@@ -203,6 +203,32 @@ tasks:
     desc: Format frontend code
     cmds:
       - cd {{.FRONTEND_DIR}} && bun run format
+
+  # ── Docker ───────────────────────────────────────────────────
+  docker:build:
+    desc: Build Docker images
+    cmds:
+      - docker compose build
+
+  docker:up:
+    desc: Start all services
+    cmds:
+      - docker compose up -d
+
+  docker:down:
+    desc: Stop all services
+    cmds:
+      - docker compose down
+
+  docker:logs:
+    desc: Tail service logs
+    cmds:
+      - docker compose logs -f
+
+  docker:test:
+    desc: Run tests in Docker
+    cmds:
+      - docker compose -f compose.test.yml up --build --abort-on-container-exit
 
   # ── Cleanup ──────────────────────────────────────────────────
   clean:

@@ -3,12 +3,12 @@
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from voice.config.settings.dev import DevelopmentConfig
-from voice.config.settings.local import LocalConfig
-from voice.config.settings.prod import ProductionConfig
-from voice.config.settings.staging import StagingConfig
-from voice.config.settings.test_env import TestingConfig
-from voice.core.enums import Environment
+from ekko.config.settings.dev import DevelopmentConfig
+from ekko.config.settings.local import LocalConfig
+from ekko.config.settings.prod import ProductionConfig
+from ekko.config.settings.staging import StagingConfig
+from ekko.config.settings.test_env import TestingConfig
+from ekko.core.enums import Environment
 
 ALL_CONFIG_CLASSES = [LocalConfig, DevelopmentConfig, TestingConfig, StagingConfig, ProductionConfig]
 

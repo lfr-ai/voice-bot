@@ -1,0 +1,62 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Containerfile
+      target: dev
+    ports:
+      - "8000:8000"
+    environment:
+      EKKO_ENVIRONMENT: local
+      EKKO_POSTGRESQL_HOST: db
+      EKKO_POSTGRESQL_PORT: "5432"
+      EKKO_POSTGRESQL_USER: postgres
+      EKKO_POSTGRESQL_PASSWORD: postgres
+      EKKO_POSTGRESQL_NAME: ekko
+    volumes:
+      - ./src:/app/src
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - backend
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ekko
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - backend
+
+  caddy:
+    build:
+      context: ./caddy
+      dockerfile: Containerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      CADDY_DOMAIN: localhost
+    depends_on:
+      - app
+    networks:
+      - backend
+      - frontend
+
+volumes:
+  pgdata:
+
+networks:
+  backend:
+  frontend:

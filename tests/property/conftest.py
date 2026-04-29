@@ -3,13 +3,13 @@
 import pytest
 from hypothesis import strategies as st
 
-from voice.core.enums import Environment, LLMProvider
+from ekko.core.enums import Environment, LLMProvider
 
 
 @pytest.fixture(autouse=True)
 def _clean_env(monkeypatch):
-    """Remove VOICE_ENVIRONMENT so pydantic-settings uses class defaults."""
-    monkeypatch.delenv("VOICE_ENVIRONMENT", raising=False)
+    """Remove EKKO_ENVIRONMENT so pydantic-settings uses class defaults."""
+    monkeypatch.delenv("EKKO_ENVIRONMENT", raising=False)
 
 
 # Strategies for domain types

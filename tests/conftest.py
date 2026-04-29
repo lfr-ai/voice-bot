@@ -23,14 +23,14 @@ def _ensure_src_on_path() -> None:
 _ensure_src_on_path()
 
 # Force test environment
-os.environ.setdefault("VOICE_ENVIRONMENT", "test")
+os.environ.setdefault("EKKO_ENVIRONMENT", "test")
 
 
 @pytest.fixture
 def settings():
     """Provide a fresh test settings instance."""
-    from voice.config.settings import BaseAppConfig
-    from voice.core.enums import Environment
+    from ekko.config.settings import BaseAppConfig
+    from ekko.core.enums import Environment
 
     return BaseAppConfig(environment=Environment.TEST, debug=False)
 
@@ -38,7 +38,7 @@ def settings():
 @pytest.fixture
 def app(settings):
     """Create a FastAPI test app with dependency overrides."""
-    from voice.composition import create_app
+    from ekko.composition import create_app
 
     application = create_app()
     return application

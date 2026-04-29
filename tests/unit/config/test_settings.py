@@ -3,19 +3,19 @@
 import pytest
 from pydantic import ValidationError
 
-from voice.config.settings import BaseAppConfig, get_settings
-from voice.config.settings.dev import DevelopmentConfig
-from voice.config.settings.local import LocalConfig
-from voice.config.settings.prod import ProductionConfig
-from voice.config.settings.staging import StagingConfig
-from voice.config.settings.test_env import TestingConfig
-from voice.core.enums import Environment
+from ekko.config.settings import BaseAppConfig, get_settings
+from ekko.config.settings.dev import DevelopmentConfig
+from ekko.config.settings.local import LocalConfig
+from ekko.config.settings.prod import ProductionConfig
+from ekko.config.settings.staging import StagingConfig
+from ekko.config.settings.test_env import TestingConfig
+from ekko.core.enums import Environment
 
 
 @pytest.fixture(autouse=True)
 def _clean_env(monkeypatch):
-    """Remove VOICE_ENVIRONMENT so pydantic-settings uses class defaults."""
-    monkeypatch.delenv("VOICE_ENVIRONMENT", raising=False)
+    """Remove EKKO_ENVIRONMENT so pydantic-settings uses class defaults."""
+    monkeypatch.delenv("EKKO_ENVIRONMENT", raising=False)
 
 
 class TestBaseAppConfig:

@@ -8,11 +8,11 @@ applyTo: "**"
 ## Architecture and Boundaries
 
 - Follow Clean Architecture dependency direction: `presentation/infrastructure -> application -> core`.
-- `src/voice/core/` must remain framework-independent — no imports from infrastructure/presentation.
-- `src/voice/application/` can import from `core` and configuration, but not concrete adapters.
-- `src/voice/infrastructure/` implements protocols declared in `core/interfaces/`.
-- `src/voice/composition/` wires everything together via the `Container` DI pattern.
-- `src/voice/presentation/api/routes/` contains FastAPI routers (health, stream, etc.).
+- `src/ekko/core/` must remain framework-independent — no imports from infrastructure/presentation.
+- `src/ekko/application/` can import from `core` and configuration, but not concrete adapters.
+- `src/ekko/infrastructure/` implements protocols declared in `core/interfaces/`.
+- `src/ekko/composition/` wires everything together via the `Container` DI pattern.
+- `src/ekko/presentation/api/routes/` contains FastAPI routers (health, stream, etc.).
 
 ## Backend Stack
 

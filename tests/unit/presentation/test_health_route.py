@@ -4,7 +4,7 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from voice.presentation.api.routes.health import router
+from ekko.presentation.api.routes.health import router
 
 
 @pytest.fixture

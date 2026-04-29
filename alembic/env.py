@@ -1,7 +1,7 @@
 """Alembic env.py configured for async SQLAlchemy engines.
 
-This file prefers a SQLAlchemy URL from the alembic config (`sqlalchemy.url`) and
-falls back to the application's settings via :func:`voice.config.settings.get_settings`.
+This file resolves the database URL from the application's settings
+via :func:`ekko.config.settings.get_settings`.
 """
 
 from __future__ import annotations
@@ -9,18 +9,16 @@ from __future__ import annotations
 import asyncio
 from logging.config import fileConfig
 
-from sqlalchemy import pool
+from sqlalchemy import pool, text
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import create_async_engine
 
 # ruff: noqa: I001
 
-
-
 # isort: off
 from alembic import context
-from voice.config.settings import get_settings
-from voice.infrastructure.db import Base
+from ekko.config.settings import get_settings
+from ekko.infrastructure.db import Base
 # isort: on
 
 # Alembic config and logging
@@ -37,12 +35,18 @@ def _get_url() -> str:
 
     Preference order:
     1. `sqlalchemy.url` in alembic.ini (useful for CI/managed runs)
-    2. application settings (VOICE_ prefixed env vars)
+    2. application settings (EKKO_ prefixed env vars)
     """
     url = config.get_main_option("sqlalchemy.url")
     if url:
         return url
-    return get_settings().postgresql_async_url
+    return get_settings().postgresql_url
+
+
+async def _ensure_extensions(connection: Connection) -> None:
+    """Create required PostgreSQL extensions if they don't exist."""
+    await connection.execute(text('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"'))
+    await connection.commit()
 
 
 def run_migrations_offline() -> None:
@@ -64,6 +68,7 @@ async def run_migrations_online() -> None:
     connectable = create_async_engine(_get_url(), poolclass=pool.NullPool)
 
     async with connectable.connect() as connection:
+        await _ensure_extensions(connection)
         await connection.run_sync(do_run_migrations)
 
     await connectable.dispose()
