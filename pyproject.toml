@@ -6,50 +6,68 @@ authors = [
     {name = "Laurits Fromberg", email = "lfr@tik-ai.dk"},
 ]
 dependencies = [
-        "fastapi>=0.116.1",
-        "uvicorn>=0.35.0",
-        "openai>=1.101.0",
-        "pydantic>=2.5.0",
-        "sqlalchemy>=2.0.18",
-        "alembic>=1.11.1",
-        "asyncpg>=0.27.0",
-        "langchain>=0.0.300",
-        "keyboard>=0.13.5",
-        "pyaudiowpatch>=0.2.12.7",
-        "websockets>=15.0.1",
-        "python-dotenv>=1.1.1",
-        "tiktoken>=0.11.0",
-        "faster-whisper>=1.2.0",
-        "numpy>=1.26",
+    "fastapi>=0.116.1",
+    "uvicorn>=0.35.0",
+    "openai>=1.101.0",
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.7.0",
+    "sqlalchemy>=2.0.18",
+    "alembic>=1.11.1",
+    "asyncpg>=0.27.0",
+    "langchain>=0.0.300",
+    "keyboard>=0.13.5",
+    "pyaudiowpatch>=0.2.12.7",
+    "websockets>=15.0.1",
+    "python-dotenv>=1.1.1",
+    "tiktoken>=0.11.0",
+    "faster-whisper>=1.2.0",
+    "numpy>=1.26",
+    "structlog>=24.0.0",
 ]
 
-requires-python = ">=3.11,<4.0"
+requires-python = ">=3.12,<4.0"
 readme = "README.md"
 license = {text = "MIT"}
 
 [dependency-groups]
 dev = [
-    "pre-commit>=4.3.0",
+    # ── Testing ───────────────────────────────────────────────
     "pytest>=8.4.1",
+    "pytest-cov>=6.0",
+    "pytest-asyncio>=1.0.0",
+    "pytest-mock>=3.14",
+    "pytest-xdist>=3.5",
+    "pytest-benchmark>=5.0",
+    "hypothesis>=6.120",
+    "factory-boy>=3.3",
+    "freezegun>=1.4",
+    "respx>=0.22",
+    # ── Linting / Formatting ──────────────────────────────────
+    "pre-commit>=4.3.0",
+    "ruff>=0.12.0",
+    "commitizen>=4.8.3",
+    # ── Type checking ─────────────────────────────────────────
     "mypy>=1.17.1",
     "types-requests>=2.31.0",
+    # ── Security ──────────────────────────────────────────────
     "bandit[toml]>=1.8.6",
-    "black>=25.1.0",
-    "isort>=6.0.1",
-    "ruff>=0.12.0",
     "detect-secrets>=1.5.0",
-    "yamllint>=1.37.1",
-    "typos>=1.35.5",
-    "pyinstaller>=6.15.0",
-    "commitizen>=4.8.3",
+    "pip-audit>=2.9",
+    # ── Quality ───────────────────────────────────────────────
     "xenon>=0.9.3",
+    "typos>=1.35.5",
+    "yamllint>=1.37.1",
+    # ── Database (test) ───────────────────────────────────────
     "psycopg2-binary>=2.9",
-    "redis>=5.0"
+    "redis>=5.0",
+    # ── Environment ───────────────────────────────────────────
+    "tox>=4.25",
+    "tox-uv>=1.25",
 ]
 
 db = [
-    "sqlalchemy>=2.1",
-    "alembic>=2.0",
+    "sqlalchemy>=2.0",
+    "alembic>=1.11",
     "asyncpg>=0.27.0",
 ]
 
@@ -58,47 +76,162 @@ rag = [
     "chromadb>=0.3.25",
 ]
 
+# ─────────────────────────────────────────────────────────────────
+# Tool configuration
+# ─────────────────────────────────────────────────────────────────
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+pythonpath = ["src"]
+addopts = ["-ra", "--strict-markers", "--strict-config", "-x", "--tb=short"]
+filterwarnings = [
+    "ignore:cannot collect test class.*TestingConfig:pytest.PytestCollectionWarning",
+]
+markers = [
+    "unit: Unit tests (fast, no external deps)",
+    "integration: Integration tests (may need DB / network)",
+    "property: Property-based tests (hypothesis)",
+    "performance: Benchmarks and performance regression tests",
+    "e2e: End-to-end tests",
+    "slow: Slow-running tests",
+]
+
+[tool.coverage.run]
+source = ["src/voice"]
+branch = true
+omit = ["*/tests/*", "*/alembic/*"]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 70
+precision = 2
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "@overload",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
 
 [tool.bandit]
 exclude_dirs = [".venv", "tests", "build", "dist"]
 skips = ["B614", "B101"]
 
-[tool.pytest.ini_options]
-addopts = "-m 'not integration'"
-markers = [
-    "integration: marks tests as integration (use -m integration to run)",
-]
-
 [tool.mypy]
 ignore_missing_imports = true
 disable_error_code = ["attr-defined"]
 check_untyped_defs = true
-python_version = "3.11"
+python_version = "3.12"
 warn_unused_configs = true
 warn_redundant_casts = true
 warn_unused_ignores = true
+plugins = ["pydantic.mypy"]
 
-[tool.isort]
-profile = "black"
+[tool.commitizen]
+name = "cz_conventional_commits"
+tag_format = "v$version"
+version_scheme = "pep440"
+version_provider = "pep621"
+update_changelog_on_bump = true
+
+# ─────────────────────────────────────────────────────────────────
+# Ruff
+# ─────────────────────────────────────────────────────────────────
 
 [tool.ruff]
 line-length = 120
-target-version = "py311"
+target-version = "py312"
 src = ["src", "tests"]
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I"]
-ignore = ["E203"]
+select = [
+    "F",     # pyflakes
+    "E",     # pycodestyle errors
+    "W",     # pycodestyle warnings
+    "C90",   # mccabe complexity
+    "I",     # isort
+    "N",     # pep8-naming
+    "UP",    # pyupgrade
+    "S",     # flake8-bandit (security)
+    "B",     # flake8-bugbear
+    "A",     # flake8-builtins
+    "C4",    # flake8-comprehensions
+    "DTZ",   # flake8-datetimez
+    "T10",   # flake8-debugger
+    "T20",   # flake8-print
+    "ISC",   # flake8-implicit-str-concat
+    "ICN",   # flake8-import-conventions
+    "PIE",   # flake8-pie
+    "PT",    # flake8-pytest-style
+    "Q",     # flake8-quotes
+    "RSE",   # flake8-raise
+    "RET",   # flake8-return
+    "SLF",   # flake8-self
+    "SIM",   # flake8-simplify
+    "TID",   # flake8-tidy-imports
+    "TCH",   # flake8-type-checking
+    "ARG",   # flake8-unused-arguments
+    "PTH",   # flake8-use-pathlib
+    "ERA",   # eradicate
+    "PL",    # pylint
+    "TRY",   # tryceratops
+    "FLY",   # flynt
+    "PERF",  # perflint
+    "FURB",  # refurb
+    "LOG",   # flake8-logging
+    "RUF",   # ruff-specific
+]
+ignore = [
+    "E203",    # whitespace before ':'
+    "S101",    # assert in production code (OK in tests via per-file-ignores)
+    "TRY003",  # long exception messages
+    "PLR0913", # too many arguments
+    "PLR2004", # magic values
+    "ISC001",  # conflicts with ruff format
+]
 
 [tool.ruff.lint.per-file-ignores]
-"src/voice/models/transcribers/transcriber.py" = ["E402"]
+"tests/**/*.py" = [
+    "S101",   # assert allowed in tests
+    "ARG",    # unused args (fixtures)
+    "PLR2004", # magic values
+    "SLF001", # private access in tests
+    "T20",    # print in tests
+    "PLC0415", # lazy imports in test fixtures
+]
+"alembic/**/*.py" = [
+    "ERA001", # commented-out code in migrations
+    "I001",   # isort — alembic has its own convention
+    "UP",     # pyupgrade — alembic templates need compat
+    "INP001", # namespace package
+    "T20",    # print
+]
+"src/voice/infrastructure/audio_streamer/**/*.py" = [
+    "T20",    # print allowed in subprocess code
+]
+"src/voice/config/**/*.py" = [
+    "PLC0415", # lazy imports for optional dependencies (sentry)
+    "TC002",   # SecretStr used at runtime, not just type checking
+]
+"src/voice/composition/**/*.py" = [
+    "PLC0415", # lazy DI imports in container + app factory
+    "C901",    # lifespan inherently complex
+    "PLR0915", # lifespan has many statements
+    "SLF001",  # private state attributes on app.state
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["voice"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.mccabe]
+max-complexity = 12
 
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
 line-ending = "lf"
-
-[tool.flake8]
-max-line-length = 120
-extend-ignore = ["E203"]

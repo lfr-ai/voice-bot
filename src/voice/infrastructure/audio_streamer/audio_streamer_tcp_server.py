@@ -2,7 +2,7 @@ import asyncio
 import logging
 from asyncio import Event, StreamReader, StreamWriter
 
-from voice.config.config import Config
+from voice.config.settings import get_settings
 from voice.infrastructure.audio_streamer.audio_streamer import AudioStreamer
 
 logger = logging.getLogger(__name__)
@@ -15,8 +15,9 @@ async def _ipc_handler(
     stop_event: Event,
 ):
     """Handle incoming TCP commands and stream audio back to the main app."""
+    settings = audio_streamer.settings
     try:
-        data = await reader.read(audio_streamer.cfg.MAX_READ_BYTES)
+        data = await reader.read(settings.max_read_bytes)
         if not data:
             writer.write(b"no data")
             await writer.drain()
@@ -33,8 +34,8 @@ async def _ipc_handler(
                 if audio_streamer.sys_sending_task is None or audio_streamer.sys_sending_task.done():
                     try:
                         sys_r, sys_w = await asyncio.open_connection(
-                            audio_streamer.cfg.HOST,
-                            audio_streamer.cfg.AUDIO_STREAMER_TCP_PORT + 1,
+                            settings.host,
+                            settings.audio_streamer_tcp_port + 1,
                         )
 
                         async def _send_loop(stream, writer_sock):
@@ -42,7 +43,7 @@ async def _ipc_handler(
                                 while audio_streamer.sending and audio_streamer.running:
                                     data = await asyncio.to_thread(
                                         stream.read,
-                                        audio_streamer.cfg.AUDIO_FRAMES_PER_BUFFER,
+                                        settings.audio_frames_per_buffer,
                                     )
                                     if not data:
                                         break
@@ -63,8 +64,8 @@ async def _ipc_handler(
                 if audio_streamer.mic_sending_task is None or audio_streamer.mic_sending_task.done():
                     try:
                         mic_r, mic_w = await asyncio.open_connection(
-                            audio_streamer.cfg.HOST,
-                            audio_streamer.cfg.AUDIO_STREAMER_TCP_PORT + 2,
+                            settings.host,
+                            settings.audio_streamer_tcp_port + 2,
                         )
 
                         async def _send_loop_mic(stream, writer_sock):
@@ -72,7 +73,7 @@ async def _ipc_handler(
                                 while audio_streamer.sending and audio_streamer.running:
                                     data = await asyncio.to_thread(
                                         stream.read,
-                                        audio_streamer.cfg.AUDIO_FRAMES_PER_BUFFER,
+                                        settings.audio_frames_per_buffer,
                                     )
                                     if not data:
                                         break
@@ -121,16 +122,16 @@ async def _ipc_handler(
 async def main():
     """Run the TCP IPC server and audio streamer."""
     stop_event = Event()
-    cfg = Config()
-    audio_streamer = AudioStreamer(cfg)
+    settings = get_settings()
+    audio_streamer = AudioStreamer(settings)
     await audio_streamer.start()  # Initialize audio streams (no output yet)
 
     server = await asyncio.start_server(
         lambda r, w: _ipc_handler(r, w, audio_streamer, stop_event),
-        host=cfg.HOST,
-        port=cfg.AUDIO_STREAMER_TCP_PORT,
+        host=settings.host,
+        port=settings.audio_streamer_tcp_port,
     )
-    print(f"IPC server started on {cfg.HOST}:{cfg.AUDIO_STREAMER_TCP_PORT}")
+    print(f"IPC server started on {settings.host}:{settings.audio_streamer_tcp_port}")
 
     try:
         async with server:

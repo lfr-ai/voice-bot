@@ -1,15 +1,16 @@
 import asyncio
 
-from voice.config.config import Config
-from voice.models.audio_streamer.audio_streamer_controller import (
+from voice.config.settings import BaseAppConfig
+from voice.infrastructure.audio_streamer.audio_streamer_controller import (
     AudioStreamerController,
 )
 
 
 def test_send_command_tcp():
-    cfg = Config()
-    cfg.HOST = "127.0.0.1"
-    cfg.AUDIO_STREAMER_TCP_PORT = 56000
+    settings = BaseAppConfig(
+        host="127.0.0.1",
+        audio_streamer_tcp_port=56000,
+    )
 
     async def handler(reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
         data = await reader.read(100)
@@ -20,8 +21,8 @@ def test_send_command_tcp():
         await writer.wait_closed()
 
     async def run_test():
-        server = await asyncio.start_server(handler, cfg.HOST, cfg.AUDIO_STREAMER_TCP_PORT)
-        controller = AudioStreamerController(cfg)
+        server = await asyncio.start_server(handler, settings.host, settings.audio_streamer_tcp_port)
+        controller = AudioStreamerController(settings)
         try:
             result = await controller.send_command("ping")
             assert result == "ACK:ping"

@@ -1,6 +1,5 @@
 from collections import namedtuple
 from enum import Enum, auto
-from typing import Type
 
 TranscriptionEntry = namedtuple("TranscriptionEntry", ["text", "offset"])
 Transcription = list[TranscriptionEntry]
@@ -15,7 +14,7 @@ class RecognitionMode(Enum):
     CUSTOMER = auto()
 
     @classmethod
-    def from_stream_type(cls: Type["RecognitionMode"], stream_type: str):
+    def from_stream_type(cls: type["RecognitionMode"], stream_type: str):
         """
         Map stream type string to RecognitionMode enumeration.
 

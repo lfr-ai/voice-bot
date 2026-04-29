@@ -1,6 +1,6 @@
 import logging
 
-from voice.config.config import Config
+from voice.config.settings import BaseAppConfig
 from voice.core.protocols import STTService
 
 logger = logging.getLogger(__name__)
@@ -13,12 +13,12 @@ class _StubSTT:
     and dev environments may run without heavy ML deps.
     """
 
-    def __init__(self, cfg: Config, **kwargs):
-        self.cfg = cfg
-        from typing import Any, Dict
+    def __init__(self, settings: BaseAppConfig, **kwargs):
+        self.settings = settings
+        from typing import Any
 
         # Map queue name -> asyncio.Queue (used for stub testing)
-        self._queues: Dict[str, Any] = {}
+        self._queues: dict[str, Any] = {}
 
     async def start(self) -> None:
         return
@@ -42,7 +42,7 @@ class _StubSTT:
                 logger.debug("_StubSTT failed to put data into queue: %s", e)
 
 
-def create_faster_whisper_stt(cfg: Config, **kwargs) -> STTService:
+def create_faster_whisper_stt(settings: BaseAppConfig, **kwargs) -> STTService:
     """Factory to create an STTService. Prefer the real `FasterWhisperSTT` if available,
     otherwise return a stub to keep dev/test environments lightweight.
     """
@@ -50,6 +50,6 @@ def create_faster_whisper_stt(cfg: Config, **kwargs) -> STTService:
         # Import lazily to avoid heavy ML deps during test collection
         from voice.infrastructure.stt.transcriber import FasterWhisperSTT
 
-        return FasterWhisperSTT(cfg=cfg, **kwargs)
+        return FasterWhisperSTT(settings=settings, **kwargs)
     except Exception:
-        return _StubSTT(cfg=cfg, **kwargs)
+        return _StubSTT(settings=settings, **kwargs)

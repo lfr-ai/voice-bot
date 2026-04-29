@@ -1,7 +1,7 @@
 import asyncio
 import socket
 
-import voice.composition as composition
+from voice import composition
 from voice.composition import create_app
 
 

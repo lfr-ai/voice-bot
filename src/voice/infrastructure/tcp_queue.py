@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Optional
 
 from voice.managers.queue_manager import QueueManager
 
@@ -21,12 +20,12 @@ class TCPQueueServer:
         self,
         host: str = "127.0.0.1",
         port: int = 7000,
-        qm: Optional[QueueManager] = None,
+        qm: QueueManager | None = None,
     ) -> None:
         self.host = host
         self.port = port
         self.qm = qm or QueueManager()
-        self.server: Optional[asyncio.AbstractServer] = None
+        self.server: asyncio.AbstractServer | None = None
 
     async def _handle(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
         try:

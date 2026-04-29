@@ -2,15 +2,16 @@
 
 This module centralizes enumerated constants used across layers. Use this
 file as the single source-of-truth for shared string and int constants.
+
+Convention: ``StrEnum`` + ``@unique`` + ``auto()`` for all string enums.
 """
 
 from __future__ import annotations
 
-from enum import IntEnum, StrEnum, unique
-from typing import List
+from enum import IntEnum, StrEnum, auto, unique
 
 
-def enum_values(enum_cls: type[StrEnum]) -> List[str]:
+def enum_values(enum_cls: type[StrEnum]) -> list[str]:
     """Return the string values of a StrEnum class in declaration order."""
 
     return [e.value for e in enum_cls]
@@ -18,21 +19,21 @@ def enum_values(enum_cls: type[StrEnum]) -> List[str]:
 
 @unique
 class Environment(StrEnum):
-    LOCAL = "local"
-    DEV = "dev"
-    TEST = "test"
-    STAGING = "staging"
-    PROD = "prod"
+    LOCAL = auto()
+    DEV = auto()
+    TEST = auto()
+    STAGING = auto()
+    PROD = auto()
 
 
 @unique
 class LLMProvider(StrEnum):
-    OPENAI = "openai"
-    AZURE_OPENAI = "azure_openai"
-    ANTHROPIC = "anthropic"
-    COHERE = "cohere"
-    GOOGLE = "google"
-    OTHER = "other"
+    OPENAI = auto()
+    AZURE_OPENAI = auto()
+    ANTHROPIC = auto()
+    COHERE = auto()
+    GOOGLE = auto()
+    OTHER = auto()
 
 
 @unique
@@ -45,20 +46,20 @@ class ChatModel(StrEnum):
 
 @unique
 class STTProvider(StrEnum):
-    WHISPER = "whisper"
-    FASTER_WHISPER = "faster_whisper"
-    AZURE_SPEECH = "azure_speech"
-    GOOGLE_SPEECH = "google_speech"
-    OTHER = "other"
+    WHISPER = auto()
+    FASTER_WHISPER = auto()
+    AZURE_SPEECH = auto()
+    GOOGLE_SPEECH = auto()
+    OTHER = auto()
 
 
 @unique
 class AudioFormat(StrEnum):
-    WAV = "wav"
-    FLAC = "flac"
-    MP3 = "mp3"
-    OGG = "ogg"
-    PCM16 = "pcm16"
+    WAV = auto()
+    FLAC = auto()
+    MP3 = auto()
+    OGG = auto()
+    PCM16 = auto()
 
 
 @unique
@@ -87,28 +88,28 @@ class BitDepth(IntEnum):
 
 @unique
 class QueueName(StrEnum):
-    TRANSCRIPTS = "transcripts"
-    COMMANDS = "commands"
-    EVENTS = "events"
-    METRICS = "metrics"
+    TRANSCRIPTS = auto()
+    COMMANDS = auto()
+    EVENTS = auto()
+    METRICS = auto()
 
 
 @unique
 class TranscriptStatus(StrEnum):
-    RECEIVED = "received"
-    QUEUED = "queued"
-    PROCESSING = "processing"
-    COMPLETED = "completed"
-    FAILED = "failed"
-    CANCELLED = "cancelled"
+    RECEIVED = auto()
+    QUEUED = auto()
+    PROCESSING = auto()
+    COMPLETED = auto()
+    FAILED = auto()
+    CANCELLED = auto()
 
 
 @unique
 class MessageRole(StrEnum):
-    SYSTEM = "system"
-    USER = "user"
-    ASSISTANT = "assistant"
-    TOOL = "tool"
+    SYSTEM = auto()
+    USER = auto()
+    ASSISTANT = auto()
+    TOOL = auto()
 
 
 @unique
@@ -123,34 +124,33 @@ class LogLevel(IntEnum):
 
 @unique
 class DeploymentTarget(StrEnum):
-    LOCAL = "local"
-    DOCKER = "docker"
-    KUBERNETES = "kubernetes"
-    AZURE_CONTAINER_APPS = "azure_container_apps"
-    AZURE_FUNCTIONS = "azure_functions"
+    LOCAL = auto()
+    DOCKER = auto()
+    KUBERNETES = auto()
+    AZURE_CONTAINER_APPS = auto()
+    AZURE_FUNCTIONS = auto()
 
 
 @unique
 class FeatureFlag(StrEnum):
-    RAG_ENABLED = "rag_enabled"
-    USE_AZURE_KEYVAULT = "use_azure_keyvault"
-    ENABLE_TELEMETRY = "enable_telemetry"
+    RAG_ENABLED = auto()
+    ENABLE_TELEMETRY = auto()
 
 
 __all__ = [
-    "Environment",
-    "LLMProvider",
-    "ChatModel",
-    "STTProvider",
-    "AudioFormat",
     "AudioChannel",
-    "SampleRate",
+    "AudioFormat",
     "BitDepth",
-    "QueueName",
-    "TranscriptStatus",
-    "MessageRole",
-    "LogLevel",
+    "ChatModel",
     "DeploymentTarget",
+    "Environment",
     "FeatureFlag",
+    "LLMProvider",
+    "LogLevel",
+    "MessageRole",
+    "QueueName",
+    "STTProvider",
+    "SampleRate",
+    "TranscriptStatus",
     "enum_values",
 ]

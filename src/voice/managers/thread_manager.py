@@ -1,5 +1,6 @@
+from collections.abc import Callable
 from threading import Event, Thread
-from typing import Any, Callable, List, Optional
+from typing import Any
 
 
 class ThreadManager:
@@ -10,7 +11,7 @@ class ThreadManager:
 
     def __init__(self) -> None:
         """Initialize the ThreadManager."""
-        self.threads: List[Thread] = []
+        self.threads: list[Thread] = []
         self.stop_event = Event()
 
     def start_thread(
@@ -36,7 +37,7 @@ class ThreadManager:
         self.stop_event.set()
         self._wait_for_threads()
 
-    def _wait_for_threads(self, timeout: Optional[float] = None) -> None:
+    def _wait_for_threads(self, timeout: float | None = None) -> None:
         """Wait for all living threads to finish.
 
         Args:

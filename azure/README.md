@@ -1,4 +1,4 @@
-Azure infrastructure for the voice-bot project
+# Azure infrastructure for the voice-bot project
 
 This folder previously contained a full set of Bicep modules. To simplify the
 repository and remove accidental dependency on Azure Key Vault, the default
@@ -13,9 +13,10 @@ the organization's centralized IaC repository or add explicit modules in a
 separate workstream. Secrets should be provided via environment variables or
 an external secrets manager (not Key Vault) unless explicitly enabled.
 
-Usage
+## Usage
 
 1. Edit `parameters/{env}.json` with appropriate names and values.
+
 2. Deploy with:
 
 ```bash

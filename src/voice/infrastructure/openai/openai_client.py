@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from voice.config.config import Config
+from voice.config.settings import BaseAppConfig
 from voice.infrastructure.llm.chat_adapter import ChatModelAdapter
 
 
@@ -14,9 +14,7 @@ class AzureOpenAIClient:
     LangChain-based `ChatModelAdapter`.
     """
 
-    def __init__(self, cfg: Config) -> None:
-        # Keep the historical constructor signature for backwards compatibility
-        # but prefer the ChatModelAdapter implementation under the hood.
+    def __init__(self, settings: BaseAppConfig | None = None) -> None:
         self._adapter = ChatModelAdapter()
 
     def chat(
@@ -29,11 +27,7 @@ class AzureOpenAIClient:
         max_completion_tokens: int,
         **kwargs: Any,
     ) -> str:
-        """Delegate chat completions to the ChatModelAdapter.
-
-        The ``model`` parameter is mapped to the adapter's ``deployment_name``
-        for provider-agnostic invocation.
-        """
+        """Delegate chat completions to the ChatModelAdapter."""
         return self._adapter.chat(
             system_prompt,
             user_prompt,

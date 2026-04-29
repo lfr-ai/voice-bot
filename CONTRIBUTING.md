@@ -1,11 +1,13 @@
 # Contributing
 
-Please read `README.md` and follow the coding conventions in `.github/copilot-instructions.md`.
+Please read `README.md` and follow the coding conventions in
+`.github/copilot-instructions.md`.
 
 Thank you for contributing! Please follow these guidelines.
 
 - Use `uv` to manage dependencies (see `pyproject.toml`).
-- Run linters and tests before submitting PRs:
+
+Run linters and tests before submitting PRs:
 
 ```bash
 # Install dependencies
@@ -18,13 +20,16 @@ uvx pre-commit run --all-files
 uvx pytest -q
 ```
 
-If you prefer PDM it is still supported; the repo contains the original `pdm.lock`.
+If you prefer PDM it is still supported; the repo contains the original
+`pdm.lock`.
 
-- Branch naming: feature/..., fix/..., chore/...
+- Branch naming: `feature/...`, `fix/...`, `chore/...`
 - Follow Conventional Commits; commitizen is configured in `pyproject.toml`.
 
 Commit messages
-- This repository enforces Conventional Commits. Use Commitizen for interactive, validated commit messages:
+
+This repository enforces Conventional Commits. Use Commitizen for interactive,
+validated commit messages:
 
 ```bash
 # create a commit using Commitizen
@@ -33,4 +38,5 @@ cz commit
 cz c
 ```
 
-The repository includes a `.cz.toml` configuration and a pre-commit `commit-msg` hook to validate commits.
+The repository includes a `.cz.toml` configuration and a pre-commit
+`commit-msg` hook to validate commits.

@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import asyncio
 import time
+from collections.abc import Callable
 from functools import wraps
-from typing import Callable, Optional, TypeVar
+from typing import TypeVar
 
 F = TypeVar("F", bound=Callable[..., object])
 
 
-def api_retry(_func: Optional[F] = None, *, max_attempts: int = 3, backoff_seconds: float = 0.5):
+def api_retry(_func: F | None = None, *, max_attempts: int = 3, backoff_seconds: float = 0.5):
     """Decorator that retries a function or coroutine on exception.
 
     Supports both usage forms:

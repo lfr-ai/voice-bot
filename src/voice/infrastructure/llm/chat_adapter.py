@@ -8,7 +8,7 @@ This mirrors the pattern used in the golden-standard `koda_automation` project:
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, List
+from typing import TYPE_CHECKING, Any
 
 from langchain.chat_models import init_chat_model
 from langchain_core.language_models.chat_models import BaseChatModel
@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     from voice.config.settings import AppSettings as SettingsType
 
 
-def _build_provider_kwargs(settings: SettingsType) -> Dict[str, Any]:
+def _build_provider_kwargs(settings: SettingsType) -> dict[str, Any]:
     if settings.llm_provider == LLMProvider.AZURE_OPENAI:
         return {
             "azure_endpoint": settings.azure_openai_endpoint,
@@ -68,10 +68,10 @@ class ChatModelAdapter(ChatPort):
         self._settings = settings or get_settings()
         self._provider = self._settings.llm_provider
         self._provider_kwargs = _build_provider_kwargs(self._settings)
-        self._models: Dict[str, BaseChatModel] = {}
+        self._models: dict[str, BaseChatModel] = {}
 
     @classmethod
-    def from_settings(cls, settings: AppSettings) -> "ChatModelAdapter":
+    def from_settings(cls, settings: AppSettings) -> ChatModelAdapter:
         return cls(settings=settings)
 
     def _get_model(self, deployment_name: str) -> BaseChatModel:
@@ -89,16 +89,16 @@ class ChatModelAdapter(ChatPort):
         return self._models[deployment_name]
 
     @staticmethod
-    def _build_messages(system: str, user: str) -> List[BaseMessage]:
+    def _build_messages(system: str, user: str) -> list[BaseMessage]:
         return [SystemMessage(content=system), HumanMessage(content=user)]
 
     @api_retry
-    async def _run_completion_async(self, model: BaseChatModel, messages: List[BaseMessage], **kwargs: Any) -> str:
+    async def _run_completion_async(self, model: BaseChatModel, messages: list[BaseMessage], **kwargs: Any) -> str:
         response = await model.bind(**kwargs).ainvoke(messages)
         return _extract_response_text(response)
 
     @api_retry
-    def _run_completion(self, model: BaseChatModel, messages: List[BaseMessage], **kwargs: Any) -> str:
+    def _run_completion(self, model: BaseChatModel, messages: list[BaseMessage], **kwargs: Any) -> str:
         response = model.bind(**kwargs).invoke(messages)
         return _extract_response_text(response)
 
@@ -110,11 +110,11 @@ class ChatModelAdapter(ChatPort):
         deployment_name: str,
         max_completion_tokens: int = 1024,
         temperature: float = 0.0,
-        kwargs: Dict[str, Any] | None = None,
-    ) -> tuple[BaseChatModel, List[BaseMessage], Dict[str, Any]]:
+        kwargs: dict[str, Any] | None = None,
+    ) -> tuple[BaseChatModel, list[BaseMessage], dict[str, Any]]:
         model = self._get_model(deployment_name)
         messages = self._build_messages(system_prompt, user_prompt)
-        invoke_kwargs: Dict[str, Any] = {
+        invoke_kwargs: dict[str, Any] = {
             "max_tokens": max_completion_tokens,
             "temperature": temperature,
         }

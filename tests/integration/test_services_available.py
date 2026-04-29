@@ -23,12 +23,12 @@ def test_postgres_and_redis_available():
             user=os.environ.get("POSTGRES_USER", "postgres"),
             password=pg_password,
             host=os.environ.get("POSTGRES_HOST", "127.0.0.1"),
-            port=int(os.environ.get("POSTGRES_PORT", 5432)),
+            port=int(os.environ.get("POSTGRES_PORT", "5432")),
             connect_timeout=2,
         )
         conn.close()
     except Exception as e:
-        raise AssertionError(f"Postgres not available: {e}")
+        raise AssertionError(f"Postgres not available: {e}") from e
 
     try:
         import redis
@@ -36,4 +36,4 @@ def test_postgres_and_redis_available():
         r = redis.Redis(host="127.0.0.1", port=6379, db=0)
         r.ping()
     except Exception as e:
-        raise AssertionError(f"Redis not available: {e}")
+        raise AssertionError(f"Redis not available: {e}") from e

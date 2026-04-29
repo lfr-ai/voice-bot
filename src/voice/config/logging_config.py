@@ -10,12 +10,13 @@ from __future__ import annotations
 import logging
 import os
 from logging.config import dictConfig
-from typing import Optional
 
-from voice.config.settings import SETTINGS
+from voice.config.settings import get_settings
+
+SETTINGS = get_settings()
 
 
-def configure_logging(level: Optional[str] = None) -> None:
+def configure_logging(level: str | None = None) -> None:
     """Configure structured logging for the application.
 
     If logging is already configured (handlers present on the root logger) this

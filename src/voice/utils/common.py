@@ -1,36 +1,26 @@
 from pathlib import Path
 
-from voice.config.config import Config
+from voice.config.settings import get_settings
 
-cfg = Config()
+SETTINGS = get_settings()
 
 
 def _validate_file_path(dir_path: Path, filename: str, suffix: str) -> Path:
-    """
-    Validate and return a path to a file.
+    """Validate and return a path to a file.
 
-    Args:
-        dir_path (Path): Path to the directory of the file.
-        filename (str): Name of the file.
-        suffix (str): Extension of the file.
-
-    Returns:
-        Path: Validated file path.
+    Raises FileNotFoundError or ValueError on failure.
     """
+
     path = dir_path / filename
     if not path.is_file():
-        raise FileNotFoundError(f"File '{filename}' not found in '{str(dir_path)}'.")
-    elif path.suffix != suffix:
+        raise FileNotFoundError(f"File '{filename}' not found in '{dir_path!s}'.")
+    if path.suffix != suffix:
         raise ValueError(f"File '{filename}' must have a '{suffix}' extension.")
     return path
 
 
 def load_prompt(filename: str) -> str:
-    """
-    Load a prompt from a .txt-file.
-
-    Args:
-        filename (str): Name of the file.
-    """
-    prompt_path = _validate_file_path(cfg.PROMPT_DIR_PATH, filename, ".txt")
-    return prompt_path.read_text()
+    """Load a prompt text file from the configured prompts directory."""
+    prompt_dir = SETTINGS.prompt_dir_path
+    prompt_path = _validate_file_path(Path(prompt_dir), filename, ".txt")
+    return prompt_path.read_text(encoding="utf8")

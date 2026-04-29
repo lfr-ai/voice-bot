@@ -12,4 +12,4 @@ from voice.infrastructure.llm.chat_adapter import ChatModelAdapter
 # Backwards compatibility name
 LangChainChatAdapter = ChatModelAdapter
 
-__all__ = ["LangChainChatAdapter", "ChatModelAdapter"]
+__all__ = ["ChatModelAdapter", "LangChainChatAdapter"]

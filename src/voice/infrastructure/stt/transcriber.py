@@ -4,15 +4,17 @@ import asyncio
 import os
 import tempfile
 import wave
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Callable, Optional
+from typing import TYPE_CHECKING, Any
 
-from voice.config.config import Config
+from voice.config.settings import BaseAppConfig, get_settings
 from voice.utils.logger import Logger
 
 if TYPE_CHECKING:
-    from numpy import ndarray
+    from numpy import ndarray  # noqa: F401
 
+np: Any = None
 try:
     import numpy as np
 except Exception:  # pragma: no cover - optional runtime dependency
@@ -24,8 +26,8 @@ try:
 except Exception:  # pragma: no cover - optional runtime dependency
     FasterWhisperModel = None
 
-cfg = Config()
-logger = Logger.create(__name__, cfg.LOGS_DIR_PATH / "stt.logs")
+_settings = get_settings()
+logger = Logger.create(__name__, _settings.logs_dir_path / "stt.logs")
 
 
 @dataclass
@@ -41,27 +43,24 @@ class FasterWhisperSTT:
 
     def __init__(
         self,
-        cfg: Config,
+        settings: BaseAppConfig,
         model_name: str = "small",
-        device: Optional[str] = None,
-        compute_type: Optional[str] = None,
+        device: str | None = None,
+        compute_type: str | None = None,
         batch_seconds: float = 5.0,
-        sample_rate: Optional[int] = None,
-        channels: Optional[int] = None,
+        sample_rate: int | None = None,
+        channels: int | None = None,
         language: str = "da",
-        on_transcript: Optional[Callable[[Transcript], Any]] = None,
-        output_queue: Optional[asyncio.Queue[Any]] = None,
+        on_transcript: Callable[[Transcript], Any] | None = None,
+        output_queue: asyncio.Queue[Any] | None = None,
     ) -> None:
-        self.cfg = cfg
+        self.settings = settings
         self.model_name = model_name
-        self.device = device or getattr(cfg, "STT_DEVICE", "cpu")
-        # ctranslate2/Whisper does not accept None for compute_type; ensure a valid default
-        self.compute_type = compute_type if compute_type is not None else getattr(cfg, "STT_COMPUTE_TYPE", "default")
+        self.device = device or settings.stt_device
+        self.compute_type = compute_type or settings.stt_compute_type
         self.batch_seconds = float(batch_seconds)
-        self.sample_rate = (
-            sample_rate or getattr(cfg, "AUDIO_SAMPLE_RATE", None) or getattr(cfg, "SAMPLE_RATE", None) or 48000
-        )
-        self.channels = channels or getattr(cfg, "AUDIO_CHANNELS", None) or 2
+        self.sample_rate = sample_rate or settings.audio_sample_rate
+        self.channels = channels or settings.audio_channels
         self.language = language
         self.on_transcript = on_transcript
         self.output_queue = output_queue
@@ -170,10 +169,12 @@ class FasterWhisperSTT:
         sample_rate: int,
         channels: int,
     ) -> str:
-        if np is None:
+        try:
+            import numpy as np
+        except Exception:  # pragma: no cover - optional runtime dependency
             raise RuntimeError("numpy is required for STT processing")
 
-        arr: ndarray[Any, Any] = np.frombuffer(raw_bytes, dtype=np.int16)
+        arr = np.frombuffer(raw_bytes, dtype=np.int16)
         if channels > 1:
             n_frames = arr.shape[0] // channels
             arr = arr[: n_frames * channels]

@@ -1,0 +1,85 @@
+"""Tests for settings configuration."""
+
+import pytest
+from pydantic import ValidationError
+
+from voice.config.settings import BaseAppConfig, get_settings
+from voice.config.settings.dev import DevelopmentConfig
+from voice.config.settings.local import LocalConfig
+from voice.config.settings.prod import ProductionConfig
+from voice.config.settings.staging import StagingConfig
+from voice.config.settings.test_env import TestingConfig
+from voice.core.enums import Environment
+
+
+@pytest.fixture(autouse=True)
+def _clean_env(monkeypatch):
+    """Remove VOICE_ENVIRONMENT so pydantic-settings uses class defaults."""
+    monkeypatch.delenv("VOICE_ENVIRONMENT", raising=False)
+
+
+class TestBaseAppConfig:
+    def test_default_environment(self):
+        cfg = BaseAppConfig()
+        assert cfg.environment == Environment.LOCAL
+
+    def test_default_host(self):
+        cfg = BaseAppConfig()
+        assert cfg.host == "127.0.0.1"
+
+    def test_frozen(self):
+        cfg = BaseAppConfig()
+        with pytest.raises(ValidationError):
+            cfg.host = "0.0.0.0"  # noqa: S104
+
+    def test_postgresql_url(self):
+        cfg = BaseAppConfig(
+            postgresql_user="user",
+            postgresql_host="localhost",
+            postgresql_port=5432,
+            postgresql_name="db",
+        )
+        assert "postgresql://user@localhost:5432/db" in cfg.postgresql_url
+
+    def test_audio_settings_present(self):
+        cfg = BaseAppConfig()
+        assert cfg.audio_streamer_tcp_port == 6600
+        assert cfg.audio_frames_per_buffer == 1024
+        assert cfg.audio_channels == 2
+        assert cfg.max_read_bytes == 100
+        assert cfg.wait_timeout_seconds == 2
+        assert cfg.sleep_delay_seconds == 0.1
+
+
+class TestEnvironmentConfigs:
+    def test_local_debug_on(self):
+        cfg = LocalConfig()
+        assert cfg.debug is True
+        assert cfg.environment == Environment.LOCAL
+
+    def test_dev_debug_on(self):
+        cfg = DevelopmentConfig()
+        assert cfg.debug is True
+        assert cfg.environment == Environment.DEV
+
+    def test_test_debug_off(self):
+        cfg = TestingConfig()
+        assert cfg.debug is False
+        assert cfg.postgresql_name == "voice_test"
+
+    def test_staging_debug_off(self):
+        cfg = StagingConfig()
+        assert cfg.debug is False
+        assert cfg.environment == Environment.STAGING
+
+    def test_prod_debug_off(self):
+        cfg = ProductionConfig()
+        assert cfg.debug is False
+        assert cfg.environment == Environment.PROD
+
+
+class TestGetSettings:
+    def test_returns_base_app_config(self):
+        # get_settings is cached; just verify it returns the right type
+        s = get_settings()
+        assert isinstance(s, BaseAppConfig)

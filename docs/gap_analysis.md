@@ -1,41 +1,64 @@
-Gap analysis: voice-bot vs golden standards (koda_automation & copier-fullstack-template)
+# Gap analysis: voice-bot vs golden standards (koda_automation & copier-fullstack-template)
 
 Summary:
-- voice-bot is a small, well-structured Python package under `src/voice` with FastAPI app and modular components.
-- Golden repos provide comprehensive infra, CI, Taskfile, consistency checks, and a full frontend template.
+
+- voice-bot is a small, well-structured Python package living under `src/voice`.
+- It provides a FastAPI application and modular components used by the service.
+- Golden repositories typically include broader infra, CI, Taskfile helpers,
+  consistency checks, and a full frontend template.
 
 Key gaps and recommended actions (exhaustive):
 
-1) Repository governance and metadata
- - Add: `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, and `CHANGELOG.md` (or keep and standardize)
- - Add: `.github/ISSUE_TEMPLATE` and `PULL_REQUEST_TEMPLATE` for consistent PRs
+## Repository governance and metadata
 
-2) CI/CD and Release
- - CI baseline added; extend with caching, matrix builds, packaging and release automation (GitHub Releases or CI artifacts)
- - Add security scanning jobs (bandit, dependency checks) and secret detection
+- Add repository metadata files: `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`,
+  `SECURITY.md`, and `CHANGELOG.md` (or keep and standardize existing docs).
+- Add GitHub templates: `.github/ISSUE_TEMPLATE` and `PULL_REQUEST_TEMPLATE`.
 
-3) Developer experience
- - `.devcontainer` present; expand to include commonly used extensions and port-forwarding for frontend
- - Add Taskfile (done), `Makefile` shim if desired, and `scripts/` for common ops
+## CI/CD and Release
 
-4) Clean Architecture
- - Added skeleton packages (`core`, `application`, `infrastructure`, `presentation`) and re-export adapters
- - Next: gradually move domain logic to `core` and use interface protocols for infrastructure
+- Extend CI baseline with caching, matrix builds, packaging, and release
+  automation (GitHub Releases or CI artifacts).
+- Add security scanning jobs (Bandit, dependency checks) and secret detection.
 
-5) Frontend
- - No frontend currently; copier-fullstack-template includes a frontend template — scaffold React/Vite or chosen stack and wire to FastAPI
+## Developer experience
 
-6) IaC
- - Added `azure/iac` Bicep scaffold for core infra (ACR, Web App, Storage, Log Analytics, Cognitive Services). Key Vault is optional and disabled by default in the provided parameter files.
- - Next: add role assignments, managed identity bindings, optional Key Vault population workflows (only if Key Vault is explicitly enabled), and environment parameterization per environment
+- Expand `.devcontainer` to include commonly used extensions and port
+  forwarding for frontend development.
+- Add or extend `Taskfile` and `scripts/` for common developer operations.
 
-7) Tests & Quality
- - Added unit tests for managers; expand coverage to core/application modules and add integration tests
- - Add coverage reporting and threshold enforcement in CI
+## Clean Architecture
+
+- Create and populate skeleton packages (`core`, `application`,
+  `infrastructure`, `presentation`) and re-export adapters where applicable.
+- Gradually move domain logic into `core` and depend on protocols for
+  infrastructure adapters.
+
+## Frontend
+
+- No dedicated frontend scaffold exists yet. Consider using
+  `copier-fullstack-template` to scaffold a React/Vite app and wire it to the
+  FastAPI back end.
+
+## IaC
+
+- Provide `azure/iac` Bicep modules for core infra (ACR, Web App, Storage,
+  Log Analytics, Cognitive Services). Key Vault remains optional and disabled
+  by default in parameter files.
+- Add role assignments, managed identity bindings and optional Key Vault
+  population workflows (only if Key Vault is explicitly enabled). Also add
+  environment parameterization per environment.
+
+## Tests & Quality
+
+- Increase unit and integration coverage (move tests to core/application
+  modules where appropriate).
+- Add coverage reporting and threshold enforcement in CI.
 
 Action plan (priority):
-1. Harden CI (linting, security scans, matrix, caching)
-2. Complete Clean-Architecture refactor incrementally (move code pieces and add tests)
-3. Scaffold frontend and local compose dev setup
-4. Enhance IaC with RBAC and managed identity wiring, environment param files
-5. Expand tests and enforce coverage
+
+1. Harden CI (linting, security scans, matrix, caching).
+2. Continue Clean-Architecture refactor incrementally and add tests.
+3. Scaffold frontend and provide a local compose-based dev setup.
+4. Enhance IaC with RBAC and managed identity wiring and environment params.
+5. Expand tests and enforce coverage.

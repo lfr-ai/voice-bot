@@ -1,21 +1,21 @@
 import asyncio
-from typing import Any, Optional
+from typing import Any
 
 import pyaudiowpatch as pyaudio
 from pyaudiowpatch import Stream
 
-from voice.config.config import Config
+from voice.config.settings import BaseAppConfig
 from voice.utils.types_ import RecognitionMode
 
 
 class AudioStreamer:
     """Stream system + mic audio to STT queues (in this setup, send over TCP)."""
 
-    def __init__(self, cfg: Config):
-        self.cfg = cfg
+    def __init__(self, settings: BaseAppConfig):
+        self.settings = settings
         self.running = False
         self.sending = False
-        self.group: Optional[asyncio.TaskGroup] = None
+        self.group: asyncio.TaskGroup | None = None
         from typing import Any
 
         # PyAudio instance (lazy-created in _initialize)
@@ -34,11 +34,11 @@ class AudioStreamer:
 
     def _create_stream(self, device_info: dict[str, Any]) -> Stream:
         return self.p.open(
-            format=self.cfg.AUDIO_FORMAT,
+            format=self.settings.audio_format,
             channels=device_info["maxInputChannels"],
             rate=int(device_info["defaultSampleRate"]),
             input=True,
-            frames_per_buffer=self.cfg.AUDIO_FRAMES_PER_BUFFER,
+            frames_per_buffer=self.settings.audio_frames_per_buffer,
             input_device_index=device_info["index"],
         )
 
@@ -57,10 +57,10 @@ class AudioStreamer:
         try:
             while self.running:
                 if self.sending:
-                    data = await asyncio.to_thread(stream.read, self.cfg.AUDIO_FRAMES_PER_BUFFER)
+                    data = await asyncio.to_thread(stream.read, self.settings.audio_frames_per_buffer)
                     await queue.put(data)
                 else:
-                    await asyncio.sleep(self.cfg.SLEEP_DELAY_SECONDS)
+                    await asyncio.sleep(self.settings.sleep_delay_seconds)
         except asyncio.CancelledError:
             pass
         except Exception as e:
@@ -75,13 +75,11 @@ class AudioStreamer:
 
     async def start(
         self,
-        sys_queue: Optional[asyncio.Queue] = None,
-        mic_queue: Optional[asyncio.Queue] = None,
+        sys_queue: asyncio.Queue | None = None,
+        mic_queue: asyncio.Queue | None = None,
     ):
         """Start streamer tasks (opens devices)."""
         self._initialize()
-        # Enter the TaskGroup context explicitly. Use a local variable to
-        # convince type checkers that it's non-None.
         group = self.group
         if group is None:
             raise RuntimeError("Failed to create TaskGroup")

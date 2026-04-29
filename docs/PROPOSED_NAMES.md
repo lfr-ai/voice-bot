@@ -1,6 +1,7 @@
 # Proposed project/application names
 
-Shortlist of modern, concise names for the voice-bot project. Pick one and we can perform an automated rename across the repo.
+Shortlist of modern, concise names for the voice-bot project.
+Pick one and we can perform an automated rename across the repository.
 
 - vox — short, memorable, speaks to "voice"; package name: `vox`
 - voxai — explicitly AI-powered voice assistant; package name: `voxai`
@@ -10,6 +11,7 @@ Shortlist of modern, concise names for the voice-bot project. Pick one and we ca
 Recommended next steps to rename package to `vox` (example):
 
 1. Update `pyproject.toml` name to `vox`.
-2. Rename package folder `src/voice` -> `src/vox` and update imports (a repository-wide search/replace: `from voice.` -> `from vox.`).
+2. Rename package folder `src/voice` -> `src/vox`.
+    Update imports with a repository-wide search/replace: `from voice.` -> `from vox.`.
 3. Update Dockerfile, Makefile, and CI workflows to reference the new package name.
 4. Run tests and static checks; fix import paths as needed.

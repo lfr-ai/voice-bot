@@ -32,5 +32,8 @@ Follow these steps to get a local development environment running.
    - python -m uvicorn voice.interaction.main:app --reload --host 127.0.0.1 --port 8000
 
 Notes
-- This repository previously used PDM; the project has been migrated toward a standard venv + pip workflow.
-- If you need to recreate a pinned requirements.txt from pyproject.lock (if present), use your preferred tooling.
+
+- This repository previously used PDM; the project has been migrated toward a
+   standard venv + pip workflow.
+- If you need to recreate a pinned requirements.txt from pyproject.lock (if
+   present), use your preferred tooling.

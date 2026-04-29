@@ -1,6 +1,12 @@
-# Synced from repository root for tooling compatibility
-# Primary CODEOWNERS is at repository root; this file is kept in sync for GitHub tooling.
-# Adjust ownership patterns here as needed. Current fallback maintainers:
-*    @your-org/your-team
-*    @lfr-team
-*    @your-github-username
+# CODEOWNERS
+
+Synced from the repository root for tooling compatibility.
+
+Primary CODEOWNERS are maintained at the repository root; this file is kept
+in sync for GitHub tools that expect a `.github/CODEOWNERS` file.
+
+Adjust ownership patterns here as needed. Current fallback maintainers:
+
+* @your-org/your-team
+* @lfr-team
+* @your-github-username

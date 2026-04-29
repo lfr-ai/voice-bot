@@ -1,4 +1,4 @@
-from voice.config.config import Config
+from voice.config.settings import BaseAppConfig
 from voice.core.protocols import AudioStreamerControllerProtocol
 from voice.infrastructure.audio_streamer.audio_streamer_controller import (
     AudioStreamerController,
@@ -6,6 +6,6 @@ from voice.infrastructure.audio_streamer.audio_streamer_controller import (
 
 
 def create_audio_streamer_controller(
-    cfg: Config,
+    settings: BaseAppConfig,
 ) -> AudioStreamerControllerProtocol:
-    return AudioStreamerController(cfg)
+    return AudioStreamerController(settings)

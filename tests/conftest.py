@@ -1,14 +1,19 @@
-"""Pytest configuration and test bootstrap helpers."""
+"""Root test configuration.
+
+Sets up environment for all test sessions and provides shared fixtures.
+"""
 
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
+
+import pytest
 
 
 def _ensure_src_on_path() -> None:
     """Ensure local source directory is importable in test sessions."""
-
     src_path = Path(__file__).resolve().parents[1] / "src"
     src_str = str(src_path)
     if src_str not in sys.path:
@@ -16,3 +21,33 @@ def _ensure_src_on_path() -> None:
 
 
 _ensure_src_on_path()
+
+# Force test environment
+os.environ.setdefault("VOICE_ENVIRONMENT", "test")
+
+
+@pytest.fixture
+def settings():
+    """Provide a fresh test settings instance."""
+    from voice.config.settings import BaseAppConfig
+    from voice.core.enums import Environment
+
+    return BaseAppConfig(environment=Environment.TEST, debug=False)
+
+
+@pytest.fixture
+def app(settings):
+    """Create a FastAPI test app with dependency overrides."""
+    from voice.composition import create_app
+
+    application = create_app()
+    return application
+
+
+@pytest.fixture
+def client(app):
+    """Create a test client for the FastAPI app."""
+    from fastapi.testclient import TestClient
+
+    with TestClient(app, raise_server_exceptions=False) as c:
+        yield c

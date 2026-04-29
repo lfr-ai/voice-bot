@@ -1,3 +1,18 @@
-"""Configuration helpers and environment parsing utilities."""
+"""Configuration helpers and environment parsing utilities.
 
-__all__: list[str] = []
+Re-exports the canonical settings API so callers can write::
+
+    from voice.config import get_settings
+"""
+
+from voice.config.settings import (
+    SETTINGS,
+    BaseAppConfig,
+    get_settings,
+)
+
+__all__ = [
+    "SETTINGS",
+    "BaseAppConfig",
+    "get_settings",
+]

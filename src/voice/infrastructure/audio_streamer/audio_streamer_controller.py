@@ -1,29 +1,28 @@
 import asyncio
+import builtins
 import json
 import logging
 import subprocess
 import sys
-from asyncio import TimeoutError
 from asyncio.subprocess import Process
-from typing import Optional
 
-from voice.config.config import Config
+from voice.config.settings import BaseAppConfig
 from voice.infrastructure.audio_streamer.audio_streamer import AudioStreamer
 
 
 class AudioStreamerController:
     """Controller for audio streamer subprocess."""
 
-    def __init__(self, cfg: Config):
-        self.cfg = cfg
-        self.audio_streamer = AudioStreamer(cfg)  # For device info and potential future use
+    def __init__(self, settings: BaseAppConfig):
+        self.settings = settings
+        self.audio_streamer = AudioStreamer(settings)  # For device info and potential future use
         self.subprocess: Process | None = None
-        self.previous_device_names: Optional[dict[str, str]] = None
+        self.previous_device_names: dict[str, str] | None = None
 
     async def _launch_subprocess(self) -> Process:
         """Launch the audio-streamer TCP server subprocess."""
         return await asyncio.create_subprocess_exec(
-            sys.executable, "-m", self.cfg.AUDIO_STREAMER_TCP_SERVER_MODULE_PATH
+            sys.executable, "-m", self.settings.audio_streamer_tcp_server_module_path
         )
 
     async def _get_device_names(self) -> dict[str, str]:
@@ -50,8 +49,6 @@ class AudioStreamerController:
         )
 
         if result.returncode != 0 or not result.stdout:
-            # If we cannot query device names (missing audio libs in the test
-            # environment), return safe defaults to avoid crashing the caller.
             logging.getLogger(__name__).debug(
                 "Failed to query audio device names; return defaults. rc=%s, stderr=%s",
                 result.returncode,
@@ -76,15 +73,14 @@ class AudioStreamerController:
             try:
                 await self.send_command("stop")
             except Exception as e:
-                # If we cannot send the command (process not listening), proceed to terminate
                 logging.getLogger(__name__).debug("Failed to send stop command: %s", e)
             try:
-                await asyncio.wait_for(self.subprocess.wait(), timeout=self.cfg.WAIT_TIMEOUT_SECONDS)
-            except TimeoutError:
+                await asyncio.wait_for(self.subprocess.wait(), timeout=self.settings.wait_timeout_seconds)
+            except builtins.TimeoutError:
                 self.subprocess.terminate()
                 try:
-                    await asyncio.wait_for(self.subprocess.wait(), timeout=self.cfg.WAIT_TIMEOUT_SECONDS)
-                except TimeoutError:
+                    await asyncio.wait_for(self.subprocess.wait(), timeout=self.settings.wait_timeout_seconds)
+                except builtins.TimeoutError:
                     self.subprocess.kill()
                     await self.subprocess.wait()
 
@@ -98,10 +94,10 @@ class AudioStreamerController:
 
     async def send_command(self, cmd: str) -> str:
         """Send a command to the audio-streamer subprocess via TCP."""
-        reader, writer = await asyncio.open_connection(self.cfg.HOST, self.cfg.AUDIO_STREAMER_TCP_PORT)
+        reader, writer = await asyncio.open_connection(self.settings.host, self.settings.audio_streamer_tcp_port)
         writer.write(cmd.encode())
         await writer.drain()
-        response = await reader.read(self.cfg.MAX_READ_BYTES)
+        response = await reader.read(self.settings.max_read_bytes)
         writer.close()
         await writer.wait_closed()
         return response.decode().strip()

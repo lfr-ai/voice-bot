@@ -19,34 +19,45 @@ resp = adapter.chat(
 )
 ```
 
-Supports both sync (`chat`) and async (`async_chat`) invocation.
-# LangChain Adapter
+Supports both synchronous (`chat`) and asynchronous (`async_chat`) methods.
 
-This repository includes a LangChain-based chat adapter located at:
+Adapter details
 
-```
+The LangChain-based adapter implementation lives at:
+
+```text
 src/voice/infrastructure/llm/langchain_adapter.py
 ```
 
-The adapter implements a simple provider-agnostic interface (`ChatPort` in
-`src/voice/core/protocols.py`) and mirrors the pattern used in the
-`koda_automation` golden-standard repository.
+The adapter implements a provider-agnostic interface (see `ChatPort` in
+`src/voice/core/protocols.py`) and follows the composition pattern used in the
+repository.
 
-Design notes:
-- Provider selection is driven from `Settings` (`LLM_PROVIDER`).
+Design notes
+
+- Provider selection is driven from `Settings` (configured via environment
+  variables).
 - The adapter lazily initializes model clients and caches them per deployment.
-- `OpenAI` and `Azure OpenAI` are supported; KeyVault is not used — API keys are
-  expected in environment variables.
+- OpenAI and Azure OpenAI are supported. API keys are expected in environment
+  variables; Key Vault is not used by default.
 
-How to use:
+How to use
 
-1. Configure `OPENAI_API_KEY` and `LLM_MODEL` in `.env` or CI secrets.
-2. Create adapter from settings:
+1. Configure API credentials and model/deployment settings via environment
+   variables or CI secrets.
+2. Create the adapter from settings and call `chat`/`async_chat` as required.
 
-```py
-from voice.config.settings import settings
+```python
+from voice.config.settings import get_settings
 from voice.infrastructure.llm.langchain_adapter import LangChainChatAdapter
 
+settings = get_settings()
 adapter = LangChainChatAdapter.from_settings(settings)
-resp = await adapter.async_chat("system", "hello", deployment_name=settings.LLM_MODEL, max_completion_tokens=256, temperature=0.0)
+resp = await adapter.async_chat(
+    system_prompt="system",
+    user_prompt="hello",
+    deployment_name=settings.llm_model,
+    max_completion_tokens=256,
+    temperature=0.0,
+)
 ```
