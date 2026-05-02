@@ -70,6 +70,7 @@ class BaseAppConfig(BaseSettings):
     interaction_dir_path: Path = package_dir_path / "interaction"
 
     # ── Audio / IPC ───────────────────────────────────────────
+    disable_audio: bool = False
     audio_streamer_tcp_port: int = 6600
     audio_streamer_tcp_server_module_path: str = "ekko.infrastructure.audio_streamer.audio_streamer_tcp_server"
     audio_format: int = 8  # pyaudiowpatch.paInt16

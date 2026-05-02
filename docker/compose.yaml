@@ -1,4 +1,23 @@
 # Base compose -- shared service definitions.
+#
+# GOLDEN STANDARD ALIGNMENT
+# -------------------------
+# This compose.yaml follows the koda_automation golden standard pattern for service orchestration:
+# - Minimal base service definitions (app and reverse proxy)
+# - x-anchor pattern for shared env_file configuration (ekko_env_files)
+# - Named volumes for persistent data (caddy_data, caddy_config)
+# - Custom networks for service isolation (backend)
+# - Healthchecks for service readiness and dependency ordering
+# - Profiles for optional services (caddy profile for reverse proxy)
+# - compose.override.yaml pattern for local developer customization (ports, mounts, hot reload)
+#
+# Reference: C:/Users/LFR/OneDrive - AP Pension/Documents/projects/koda_automation/
+#
+# INTENTIONAL DEVIATIONS
+# ----------------------
+# 1. No PostgreSQL in base compose (koda includes postgresql service)
+#    Reason: Ekko uses SQLite as default database for simplicity and local-first architecture.
+#    PostgreSQL can be added via compose.override.yaml if needed for specific deployments.
 
 name: ekko
 
@@ -15,8 +34,17 @@ services:
       dockerfile: docker/Containerfile
     init: true
     env_file: *ekko_env_files
+    environment:
+      EKKO_DISABLE_AUDIO: "true"
+      EKKO_HOST: "0.0.0.0"
     networks:
       - backend
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
 
   caddy:
     image: caddy:2.11-alpine
@@ -29,9 +57,13 @@ services:
     environment:
       UPSTREAM: "app:8000"
     volumes:
+      - ../caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       - ../caddy/snippets:/etc/caddy/snippets:ro
       - caddy_data:/data
       - caddy_config:/config
+    ports:
+      - "443:443"
+      - "80:80"
     networks:
       - backend
     healthcheck:

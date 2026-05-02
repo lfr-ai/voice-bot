@@ -5,6 +5,9 @@ version: "3"
 tasks:
   dev:
     desc: "Run FastAPI app in reload mode"
+    env:
+      PYTHONPATH: "/workspace/backend/src"
+      EKKO_DISABLE_AUDIO: "{{.EKKO_DISABLE_AUDIO | default \"false\"}}"
     cmds:
       - uv run uvicorn ekko.composition.app_factory:create_app --factory --reload --host 127.0.0.1 --port 8000
 
@@ -22,54 +25,54 @@ tasks:
   test:
     desc: "Run full backend test suite"
     cmds:
-      - uv run python -m pytest tests/ -v --tb=short {{.CLI_ARGS}}
+      - uv run python -m pytest ../tests/ -v --tb=short {{.CLI_ARGS}}
 
   test:unit:
     desc: "Run unit tests only"
     cmds:
-      - uv run python -m pytest tests/unit/ -v --tb=short {{.CLI_ARGS}}
+      - uv run python -m pytest ../tests/unit/ -v --tb=short {{.CLI_ARGS}}
 
   test:integration:
     desc: "Run integration tests"
     cmds:
-      - uv run python -m pytest tests/integration/ -v --tb=short -m integration {{.CLI_ARGS}}
+      - uv run python -m pytest ../tests/integration/ -v --tb=short -m integration {{.CLI_ARGS}}
 
   test:property:
     desc: "Run property-based tests"
     cmds:
-      - uv run python -m pytest tests/property/ -v --tb=short {{.CLI_ARGS}}
+      - uv run python -m pytest ../tests/property/ -v --tb=short {{.CLI_ARGS}}
 
   test:performance:
     desc: "Run performance benchmarks"
     cmds:
-      - uv run python -m pytest tests/performance/ -v --benchmark-only {{.CLI_ARGS}}
+      - uv run python -m pytest ../tests/performance/ -v --benchmark-only {{.CLI_ARGS}}
 
   test:e2e:
     desc: "Run end-to-end tests"
     cmds:
-      - uv run python -m pytest tests/e2e/ -v --tb=short {{.CLI_ARGS}}
+      - uv run python -m pytest ../tests/e2e/ -v --tb=short {{.CLI_ARGS}}
 
   test:coverage:
     desc: "Run tests with coverage report"
     cmds:
-      - uv run python -m pytest tests/ --cov=src/ekko --cov-report=term-missing --cov-report=html {{.CLI_ARGS}}
+      - uv run python -m pytest ../tests/ --cov=src/ekko --cov-report=term-missing --cov-report=html {{.CLI_ARGS}}
 
   # ── Linting ──────────────────────────────────────────────────
   lint:
     desc: "Lint Python code (ruff check)"
     cmds:
-      - uv run ruff check src tests
+      - uv run ruff check src ../tests
 
   format:
     desc: "Format Python code"
     cmds:
-      - uv run ruff format src tests
-      - uv run ruff check --fix src tests
+      - uv run ruff format src ../tests
+      - uv run ruff check --fix src ../tests
 
   format:check:
     desc: "Check formatting without modifying files"
     cmds:
-      - uv run ruff format --check src tests
+      - uv run ruff format --check src ../tests
 
   typecheck:
     desc: "Run type checker"
@@ -91,6 +94,11 @@ tasks:
     desc: "Scan for leaked secrets"
     cmds:
       - uv run detect-secrets scan --baseline ../.secrets.baseline
+
+  security:bandit:
+    desc: "Security scanning with Bandit"
+    cmds:
+      - uv run python -m bandit -c bandit.toml -r src/ekko
 
   # ── Database ─────────────────────────────────────────────────
   db:migrate:

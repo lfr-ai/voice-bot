@@ -72,7 +72,7 @@ class Query:
     @strawberry.field
     async def check_pii(self, info: Info, text: str) -> PIIResultType:
         """Check text for PII without modifying it."""
-        anonymizer = info.context.get("pii_anonymizer")
+        anonymizer = info.context.get("pii_anonymizer") if info.context else None
         if anonymizer is None:
             from ekko.ai.pii.anonymizer import PIIAnonymizer
 

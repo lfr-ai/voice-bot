@@ -4,6 +4,22 @@
 # Native:  UPSTREAM=localhost:$EKKO_PORT caddy run --config caddy/Caddyfile --adapter caddyfile
 #
 # Trust the CA to silence browser warnings: caddy trust
+#
+# GOLDEN STANDARD ALIGNMENT
+# -------------------------
+# This Caddyfile follows the koda_automation golden standard pattern for reverse proxy configuration:
+# - Snippet import pattern with `import snippets/*.caddy` for modular configuration
+# - Consolidated snippet files (global.caddy, routes.caddy, security.caddy) containing multiple named snippets
+# - Global block for server-wide settings (logging, security)
+# - Per-site blocks with TLS, security headers, and route imports
+# - Argument passing to snippets for upstream configuration
+# - Internal TLS for local development
+#
+# Reference: C:/Users/LFR/OneDrive - AP Pension/Documents/projects/koda_automation/
+#
+# INTENTIONAL DEVIATIONS
+# ----------------------
+# None. This Caddyfile matches the golden standard pattern for snippet-based modular configuration.
 
 import snippets/*.caddy
 

@@ -1,3 +1,0 @@
-(app_routes) {
-	reverse_proxy {args.0}
-}

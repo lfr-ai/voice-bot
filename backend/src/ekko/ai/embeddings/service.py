@@ -16,6 +16,7 @@ class EmbeddingModelProtocol(Protocol):
 
     async def aembed_documents(self, texts: list[str]) -> list[list[float]]: ...
 
+
 logger = logging.getLogger(__name__)
 
 

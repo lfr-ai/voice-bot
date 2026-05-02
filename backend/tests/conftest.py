@@ -50,3 +50,36 @@ def client(app):
 
     with TestClient(app, raise_server_exceptions=False) as c:
         yield c
+
+
+# Factory fixtures
+@pytest.fixture
+def conversation_factory():
+    """Provide ConversationFactory for test data generation."""
+    from tests.factories import ConversationFactory
+
+    return ConversationFactory
+
+
+@pytest.fixture
+def message_factory():
+    """Provide MessageFactory for test data generation."""
+    from tests.factories import MessageFactory
+
+    return MessageFactory
+
+
+@pytest.fixture
+def transcript_factory():
+    """Provide TranscriptFactory for test data generation."""
+    from tests.factories import TranscriptFactory
+
+    return TranscriptFactory
+
+
+@pytest.fixture
+def agent_result_factory():
+    """Provide AgentResultFactory for test data generation."""
+    from tests.factories import AgentResultFactory
+
+    return AgentResultFactory

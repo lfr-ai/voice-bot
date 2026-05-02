@@ -2,6 +2,27 @@
 #
 # Development container for Ekko.
 # Used by VS Code Dev Containers via .devcontainer/compose.yml.
+#
+# GOLDEN STANDARD ALIGNMENT
+# -------------------------
+# This Containerfile.dev follows the koda_automation golden standard pattern for devcontainer builds:
+# - Microsoft's official devcontainers Python base image for VSCode integration
+# - uv for Python dependency management with link-mode copy
+# - task (Taskfile.dev) for unified task running
+# - hadolint for Dockerfile linting
+# - shellcheck for shell script linting
+# - zsh as default shell for vscode user
+# - Comprehensive tooling for development workflow
+#
+# Reference: C:/Users/LFR/OneDrive - AP Pension/Documents/projects/koda_automation/
+#
+# INTENTIONAL DEVIATIONS
+# ----------------------
+# 1. Apt packages NOT version-pinned (koda uses ARG for versions)
+#    Reason: Dev container reproducibility vs maintenance overhead tradeoff favors convenience.
+#    Production Containerfile (docker/Containerfile) uses pinned base image tags for reproducibility.
+# 2. Bun installed for frontend package management (koda uses npm/yarn)
+#    Reason: Project-specific frontend tooling choice for performance and modern workflows.
 
 FROM mcr.microsoft.com/devcontainers/python:1-3.12-bookworm
 

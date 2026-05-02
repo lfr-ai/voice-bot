@@ -38,5 +38,13 @@ jobs:
       - name: Unit tests
         run: bun --cwd frontend run test
 
+      - name: Build Storybook
+        working-directory: frontend
+        run: bun run build-storybook
+
+      - name: Run Storybook Tests
+        working-directory: frontend
+        run: bun run test:storybook
+
       - name: Build
         run: bun --cwd frontend run build

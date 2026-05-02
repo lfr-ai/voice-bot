@@ -174,7 +174,7 @@ tasks:
       - task: typecheck
       - task: test
       - task: xenon
-      - task: security:audit
+      - task: security:scan
       - task: pre-commit
 
   # ── Architecture ─────────────────────────────────────────────
@@ -265,6 +265,13 @@ tasks:
     desc: "Run security audits on all dependencies"
     cmds:
       - task: backend:security:audit
+
+  security:scan:
+    desc: "Run all security scans (Bandit + pip-audit + secrets)"
+    cmds:
+      - task: backend:security:bandit
+      - task: backend:security:audit
+      - task: lint:secrets
 
   # ── Cleanup ──────────────────────────────────────────────────
   clean:
@@ -439,5 +446,13 @@ tasks:
       - cmd: bash scripts/verify-pipeline.sh
         platforms: [darwin, linux]
       - cmd: pwsh -NoProfile -File scripts/verify-pipeline.ps1
+        platforms: [windows]
+
+  verify:full:
+    desc: "Verify with full checks (longer-running tests)"
+    cmds:
+      - cmd: bash scripts/verify-pipeline.sh --full
+        platforms: [darwin, linux]
+      - cmd: pwsh -NoProfile -File scripts/verify-pipeline.ps1 -Full
         platforms: [windows]
 

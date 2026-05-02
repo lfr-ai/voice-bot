@@ -61,15 +61,99 @@ task dev:frontend  # Frontend only (port 5173)
 # Run all quality checks
 task check
 
-# Verify local pipeline before push (cross-platform)
-task verify
-
 # Individual checks:
 task lint          # Linting (ruff, biome)
 task typecheck     # Type checking (mypy, tsc)
 task test          # Run tests
 task format        # Format code
 ```
+
+### Pre-Push Validation
+
+Verify that your changes will pass CI before pushing. Use these workflows to catch issues early:
+
+#### Quick Check (< 5 min)
+
+```bash
+task verify
+```
+
+Runs essential checks that catch 95% of CI failures:
+- Linting (ruff, biome, yaml)
+- Type checking (ty, tsc)
+- Unit tests
+- Cyclomatic complexity (xenon)
+- Pre-commit hooks
+
+**Windows Note**: Uses `uv run python -m <tool>` pattern for cross-platform compatibility.
+
+#### Full CI Mirror (< 15 min)
+
+```bash
+task ci:local
+```
+
+Mirrors the complete GitHub Actions pipeline:
+1. **Lint & Format** - Fast fail on code quality issues
+2. **Security Scans** - bandit, pip-audit, detect-secrets (parallel)
+3. **Tests** - Unit tests → Integration tests (sequential)
+4. **Architecture** - Clean Architecture boundary validation
+5. **Build** - Verify compilation and packaging
+
+#### Security Scanning
+
+```bash
+# Run all security checks (bandit + pip-audit + secrets)
+task security:scan
+
+# Or run individually:
+task security:audit    # Dependency audit only (pip-audit)
+task lint:secrets      # detect-secrets baseline scan
+cd backend && uv run python -m bandit -c bandit.toml -r src/ekko   # Python security
+cd backend && uv run pip-audit                                      # Dependency audit
+```
+
+**Baselines**:
+- Secret scanning: `.secrets.baseline`
+- Bandit security: `backend/bandit.toml`
+
+**Update baselines** after reviewing and confirming false positives:
+```bash
+cd backend && uv run detect-secrets scan --update ../.secrets.baseline
+```
+
+#### CI Pipeline Structure
+
+The GitHub Actions pipeline runs in stages for optimal speed:
+
+```
+┌─────────────────────────────────────────────────────┐
+│  Stage 1: Lint & Type Check (fast fail)            │  → 3-5 min
+│  - ruff lint + format                               │
+│  - ty type check                                    │
+│  - pytest unit tests                                │
+├─────────────────────────────────────────────────────┤
+│  Stage 2: Security (parallel)                       │  → 3-5 min
+│  - bandit (Python security)                         │
+│  - pip-audit (dependency CVEs)                      │
+│  - detect-secrets (credential leaks)                │
+├─────────────────────────────────────────────────────┤
+│  Stage 3: Integration Tests (after Stage 1)        │  → 5-10 min
+│  - Database integration                             │
+│  - API integration                                  │
+│  - External service mocks                           │
+├─────────────────────────────────────────────────────┤
+│  Stage 4: Architecture & Validation                 │  → 2-5 min
+│  - Clean Architecture boundaries                    │
+│  - Link checking (lychee)                           │
+│  - ShellCheck                                       │
+│  - actionlint (workflow validation)                 │
+└─────────────────────────────────────────────────────┘
+```
+
+**Total CI time**: ~15-25 minutes
+**Local quick check**: ~5 minutes (task verify)
+**Local full mirror**: ~15 minutes (task ci:local)
 
 ### Build
 

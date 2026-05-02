@@ -142,9 +142,7 @@ test.describe("Theme system", () => {
               return true;
             }
           }
-        } catch {
-          continue;
-        }
+        } catch {}
       }
       return false;
     });

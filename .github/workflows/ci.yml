@@ -49,10 +49,69 @@ jobs:
       - name: Prune uv cache
         run: uv cache prune --ci
 
+  security:
+    name: Security scans
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: cd backend && uv sync --locked --all-extras --dev
+
+      - name: Run bandit
+        run: cd backend && uv run python -m bandit -c bandit.toml -r src/ekko
+
+      - name: Run pip-audit
+        run: cd backend && uv run pip-audit
+
+      - name: Run detect-secrets
+        run: cd backend && uv run detect-secrets scan --baseline ../.secrets.baseline
+
+      - name: Prune uv cache
+        run: uv cache prune --ci
+
+  test-integration:
+    name: Integration tests
+    runs-on: ubuntu-latest
+    needs: lint-and-test
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: cd backend && uv sync --locked --all-extras --dev
+
+      - name: Run integration tests
+        run: cd backend && uv run python -m pytest tests/integration -v --tb=short -m integration
+
+      - name: Prune uv cache
+        run: uv cache prune --ci
+
   architecture:
     name: Clean Architecture boundaries
     runs-on: ubuntu-latest
-    needs: lint-and-test
+    needs: [lint-and-test, security, test-integration]
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4

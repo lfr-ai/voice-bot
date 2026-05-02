@@ -15,9 +15,19 @@ from queue import Empty
 
 from fastapi import FastAPI
 
-from ekko import __version__
 from ekko.composition.container import Container
 from ekko.config.logging_config import configure_logging
+from ekko.config.openapi_config import (
+    OPENAPI_CONTACT,
+    OPENAPI_DESCRIPTION,
+    OPENAPI_LICENSE,
+    OPENAPI_RESPONSES,
+    OPENAPI_SERVERS,
+    OPENAPI_TAGS,
+    OPENAPI_TERMS_OF_SERVICE,
+    OPENAPI_TITLE,
+    OPENAPI_VERSION,
+)
 from ekko.config.settings import get_settings
 from ekko.core.enums import AudioQueueName, QueueName
 from ekko.infrastructure.concurrency.queue_manager import QueueManager
@@ -92,8 +102,10 @@ async def _start_transcript_bridge(app: FastAPI) -> None:
 
 async def _shutdown_services(app: FastAPI) -> None:
     """Gracefully stop audio controller, STT, and transcript bridge."""
-    await app.state.controller.stop()
-    await app.state.stt.stop()
+    if hasattr(app.state, "controller"):
+        await app.state.controller.stop()
+    if hasattr(app.state, "stt"):
+        await app.state.stt.stop()
 
     task = getattr(app.state, "_transcript_bridge_task", None)
     if task:
@@ -123,8 +135,9 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # CrewAI / HMAS service (PII anonymization wired internally)
     app.state.crewai_service = container.crewai_service
 
-    # Audio controller
-    app.state.controller = container.audio_controller
+    # Audio controller (skip if disabled, e.g., in containers)
+    if not settings.disable_audio:
+        app.state.controller = container.audio_controller
 
     # STT with transcript bridge callback
     def _on_transcript(transcript):
@@ -137,13 +150,14 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
     app.state.stt = create_faster_whisper_stt(settings=settings, on_transcript=_on_transcript)
 
-    await app.state.stt.ensure_queue(AudioQueueName.SYSTEM)
-    await app.state.stt.ensure_queue(AudioQueueName.MICROPHONE)
-    await app.state.stt.start()
+    if not settings.disable_audio:
+        await app.state.stt.ensure_queue(AudioQueueName.SYSTEM)
+        await app.state.stt.ensure_queue(AudioQueueName.MICROPHONE)
+        await app.state.stt.start()
 
-    await _start_audio_servers(app, settings, settings.host)
-    await app.state.controller.start()
-    await _start_transcript_bridge(app)
+        await _start_audio_servers(app, settings, settings.host)
+        await app.state.controller.start()
+        await _start_transcript_bridge(app)
 
     yield
 
@@ -207,10 +221,19 @@ def create_app() -> FastAPI:
     container = Container(settings=settings)
 
     app = FastAPI(
-        title="Ekko API",
-        description="AI-powered voice assistant platform",
-        version=__version__,
+        title=OPENAPI_TITLE,
+        description=OPENAPI_DESCRIPTION,
+        version=OPENAPI_VERSION,
         lifespan=_lifespan,
+        openapi_tags=OPENAPI_TAGS,
+        servers=OPENAPI_SERVERS,
+        contact=OPENAPI_CONTACT,
+        license_info=OPENAPI_LICENSE,
+        terms_of_service=OPENAPI_TERMS_OF_SERVICE,
+        openapi_url="/openapi.json",
+        docs_url="/docs",
+        redoc_url="/redoc",
+        responses=OPENAPI_RESPONSES,
     )
 
     # Store container on app state for access in lifespan and routes

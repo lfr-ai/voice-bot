@@ -1,4 +1,7 @@
 {
+  // Follows koda_automation golden standard with intentional timing optimization:
+  // postCreateCommand (heavy install) runs ONCE on create, postStartCommand (light config) runs on every start.
+  // This is more efficient than koda's postStartCommand-only approach which re-installs on every start.
   "name": "Ekko Dev Container",
   "dockerComposeFile": "compose.yml",
   "service": "app",
