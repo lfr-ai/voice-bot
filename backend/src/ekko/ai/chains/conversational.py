@@ -11,6 +11,7 @@ if TYPE_CHECKING:
 
 from ekko.ai.prompts.templates import CONVERSATIONAL_SYSTEM
 from ekko.core.enums import MessageRole
+from ekko.core.registry_constants import FIELD_CONTENT, FIELD_ROLE
 
 logger = logging.getLogger(__name__)
 
@@ -31,12 +32,12 @@ class ConversationalChain:
         if not self.history:
             return "No prior conversation."
         recent = self.history[-self.max_history :]
-        lines = [f"{msg['role']}: {msg['content']}" for msg in recent]
+        lines = [f"{msg[FIELD_ROLE]}: {msg[FIELD_CONTENT]}" for msg in recent]
         return "\n".join(lines)
 
     async def run(self, user_message: str) -> str:
         """Process a user message and return the assistant's response."""
-        self.history.append({"role": MessageRole.USER, "content": user_message})
+        self.history.append({FIELD_ROLE: MessageRole.USER, FIELD_CONTENT: user_message})
 
         context = self._build_context()
         system_prompt = CONVERSATIONAL_SYSTEM.format(context=context)
@@ -46,7 +47,7 @@ class ConversationalChain:
             user_prompt=user_message,
         )
 
-        self.history.append({"role": MessageRole.ASSISTANT, "content": response})
+        self.history.append({FIELD_ROLE: MessageRole.ASSISTANT, FIELD_CONTENT: response})
         return response
 
     def clear_history(self) -> None:

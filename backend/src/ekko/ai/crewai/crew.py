@@ -13,6 +13,8 @@ from typing import TYPE_CHECKING, Any, final
 
 from crewai import Agent, Crew, Process, Task
 
+from ekko.core.registry_constants import FIELD_ROLE
+
 if TYPE_CHECKING:
     from crewai.tools import BaseTool
 
@@ -46,7 +48,7 @@ class EkkoCrew:
         """Create an Agent from YAML config."""
         cfg = self._agents_config[agent_key]
         return Agent(
-            role=cfg["role"],
+            role=cfg[FIELD_ROLE],
             goal=cfg["goal"],
             backstory=cfg["backstory"],
             verbose=self._verbose,

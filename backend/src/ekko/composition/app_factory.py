@@ -30,6 +30,7 @@ from ekko.config.openapi_config import (
 )
 from ekko.config.settings import get_settings
 from ekko.core.enums import AudioQueueName, QueueName
+from ekko.core.registry_constants import ROUTE_DOCS, ROUTE_GRAPHQL, ROUTE_OPENAPI_JSON, ROUTE_REDOC
 from ekko.infrastructure.concurrency.queue_manager import QueueManager
 from ekko.presentation.api.routes import health_router, stream_router
 
@@ -146,9 +147,9 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         except Exception as e:
             logger.debug("Failed to put transcript into queue: %s", e)
 
-    from ekko.infrastructure.adapters.stt_adapter import create_faster_whisper_stt
+    from ekko.infrastructure.adapters.stt_adapter import create_azure_speech_stt
 
-    app.state.stt = create_faster_whisper_stt(settings=settings, on_transcript=_on_transcript)
+    app.state.stt = create_azure_speech_stt(settings=settings, on_transcript=_on_transcript)
 
     if not settings.disable_audio:
         await app.state.stt.ensure_queue(AudioQueueName.SYSTEM)
@@ -230,9 +231,9 @@ def create_app() -> FastAPI:
         contact=OPENAPI_CONTACT,
         license_info=OPENAPI_LICENSE,
         terms_of_service=OPENAPI_TERMS_OF_SERVICE,
-        openapi_url="/openapi.json",
-        docs_url="/docs",
-        redoc_url="/redoc",
+        openapi_url=ROUTE_OPENAPI_JSON,
+        docs_url=ROUTE_DOCS,
+        redoc_url=ROUTE_REDOC,
         responses=OPENAPI_RESPONSES,
     )
 
@@ -249,7 +250,7 @@ def create_app() -> FastAPI:
     # GraphQL router
     from ekko.presentation.graphql.router import graphql_router
 
-    app.include_router(graphql_router, prefix="/graphql")
+    app.include_router(graphql_router, prefix=ROUTE_GRAPHQL)
 
     # Serve built frontend when running as frozen EXE
     _mount_frontend(app)

@@ -15,10 +15,10 @@ from pathlib import Path
 
 from dotenv import dotenv_values
 
+from ekko.config.enums import Environment
 from ekko.config.settings.base import BaseAppConfig
 from ekko.config.settings.local import LocalConfig
 from ekko.config.settings.test_env import TestingConfig
-from ekko.core.enums import Environment
 
 _ROOT_DIR = Path(__file__).resolve().parents[4]
 _ENV_FILE_BY_ENV: dict[Environment, Path] = {

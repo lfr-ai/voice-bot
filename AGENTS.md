@@ -139,6 +139,40 @@ registry/                # Naming registry (JSON -> generated constants)
 - Enum values must be used instead of string literals when referencing strategy names,
   status codes, or other enumerated domain values.
 
+**Examples**:
+
+```python
+# ❌ Bad: Magic strings
+user_data = {"role": "admin", "status": "active"}
+response = requests.get("/api/users")
+
+# ✅ Good: Use registry constants and enums
+from ekko.core.registry_constants import FIELD_ROLE, FIELD_STATUS, ROUTE_API_USERS
+from ekko.core.enums.common import UserRole, Status
+
+user_data = {FIELD_ROLE: UserRole.ADMIN.value, FIELD_STATUS: Status.ACTIVE.value}
+response = requests.get(ROUTE_API_USERS)
+```
+
+**When to use module constants vs registry constants**:
+
+```python
+# Use registry constants for cross-layer values
+from ekko.core.registry_constants import FIELD_USER_ID, ROUTE_HEALTH
+
+# Use module-level constants for implementation details
+_DEFAULT_TIMEOUT: Final[int] = 30
+_MAX_RETRIES: Final[int] = 3
+_CACHE_KEY_PREFIX: Final[str] = "user_session"
+```
+
+**Legitimate exceptions** (documented in `tools/conventions/magic_strings_exceptions.json`):
+- External API contracts (OpenAPI spec fields, third-party response keys)
+- Framework limitations (Strawberry GraphQL literal defaults)
+- System dict access (audio device info, getattr fallbacks)
+
+**Enforcement**: Run `uv run python tools/conventions/check_magic_strings.py` to detect violations.
+
 ### Docstring Raises Policy
 
 - **Only document exceptions directly raised by the function body** -- never document

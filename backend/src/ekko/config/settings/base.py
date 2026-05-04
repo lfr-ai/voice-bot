@@ -23,7 +23,7 @@ except ImportError:  # pragma: no cover
         pass
 
 
-from ekko.core.enums import ChatModel, Environment, LLMProvider
+from ekko.config.enums import ChatModel, Environment, LLMProvider
 
 
 class BaseAppConfig(BaseSettings):
@@ -77,6 +77,14 @@ class BaseAppConfig(BaseSettings):
     audio_frames_per_buffer: int = 1024
     audio_channels: int = 2
     audio_sample_rate: int = 48000
+
+    # ── Azure Speech Services (STT) ───────────────────────────
+    azure_speech_key: SecretStr | None = None
+    azure_speech_region: str = "northeurope"
+    azure_speech_language: str = "da-DK"
+    azure_speech_recognition_mode: str = "continuous"
+
+    # ── Legacy STT Config (deprecated, kept for backward compat)
     stt_device: str = "cpu"
     stt_compute_type: str = "default"
 

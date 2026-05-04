@@ -1,0 +1,268 @@
+{
+  "exceptions": [
+    {
+      "file": "backend/src/ekko/config/openapi_config.py",
+      "line": 81,
+      "literal": "name",
+      "reason": "OpenAPI contact spec requires 'name' field"
+    },
+    {
+      "file": "backend/src/ekko/config/openapi_config.py",
+      "line": 83,
+      "literal": "email",
+      "reason": "OpenAPI contact spec requires 'email' field"
+    },
+    {
+      "file": "backend/src/ekko/config/openapi_config.py",
+      "line": 87,
+      "literal": "name",
+      "reason": "OpenAPI license spec requires 'name' field"
+    },
+    {
+      "file": "backend/src/ekko/config/openapi_config.py",
+      "line": 106,
+      "literal": "name",
+      "reason": "OpenAPI tag spec requires 'name' field"
+    },
+    {
+      "file": "backend/src/ekko/config/openapi_config.py",
+      "line": 110,
+      "literal": "name",
+      "reason": "OpenAPI tag spec requires 'name' field"
+    },
+    {
+      "file": "backend/src/ekko/config/openapi_config.py",
+      "line": 114,
+      "literal": "name",
+      "reason": "OpenAPI tag spec requires 'name' field"
+    },
+    {
+      "file": "backend/src/ekko/config/openapi_config.py",
+      "line": 118,
+      "literal": "name",
+      "reason": "OpenAPI tag spec requires 'name' field"
+    },
+    {
+      "file": "backend/src/ekko/config/openapi_config.py",
+      "line": 141,
+      "literal": "content",
+      "reason": "OpenAPI response spec requires 'content' field"
+    },
+    {
+      "file": "backend/src/ekko/config/openapi_config.py",
+      "line": 152,
+      "literal": "content",
+      "reason": "OpenAPI response spec requires 'content' field"
+    },
+    {
+      "file": "backend/src/ekko/config/openapi_config.py",
+      "line": 163,
+      "literal": "content",
+      "reason": "OpenAPI response spec requires 'content' field"
+    },
+    {
+      "file": "backend/src/ekko/config/openapi_config.py",
+      "line": 174,
+      "literal": "content",
+      "reason": "OpenAPI response spec requires 'content' field"
+    },
+    {
+      "file": "backend/src/ekko/config/openapi_config.py",
+      "line": 185,
+      "literal": "content",
+      "reason": "OpenAPI response spec requires 'content' field"
+    },
+    {
+      "file": "backend/src/ekko/config/openapi_config.py",
+      "line": 192,
+      "literal": "type",
+      "reason": "OpenAPI error example requires 'type' field"
+    },
+    {
+      "file": "backend/src/ekko/config/openapi_config.py",
+      "line": 201,
+      "literal": "content",
+      "reason": "OpenAPI response spec requires 'content' field"
+    },
+    {
+      "file": "backend/src/ekko/config/openapi_config.py",
+      "line": 212,
+      "literal": "content",
+      "reason": "OpenAPI response spec requires 'content' field"
+    },
+    {
+      "file": "backend/src/ekko/config/openapi_config.py",
+      "line": 223,
+      "literal": "content",
+      "reason": "OpenAPI response spec requires 'content' field"
+    },
+    {
+      "file": "backend/src/ekko/ai/pii/patterns.py",
+      "line": 43,
+      "literal": "email",
+      "reason": "PII pattern name identifier, not a field reference"
+    },
+    {
+      "file": "backend/src/ekko/ai/crewai/yaml_config.py",
+      "line": 64,
+      "literal": "role",
+      "reason": "Parsing YAML config structure from external file"
+    },
+    {
+      "file": "backend/src/ekko/ai/crewai/yaml_config.py",
+      "line": 105,
+      "literal": "role",
+      "reason": "Parsing YAML config structure from external file"
+    },
+    {
+      "file": "backend/src/ekko/ai/crewai/crew.py",
+      "line": 49,
+      "literal": "role",
+      "reason": "Parsing YAML config structure from external file"
+    },
+    {
+      "file": "backend/src/ekko/infrastructure/audio_streamer/audio_streamer.py",
+      "line": 49,
+      "literal": "name",
+      "reason": "Accessing system audio device info dict from external library"
+    },
+    {
+      "file": "backend/src/ekko/infrastructure/audio_streamer/audio_streamer.py",
+      "line": 54,
+      "literal": "name",
+      "reason": "Accessing system audio device info dict from external library"
+    },
+    {
+      "file": "backend/src/ekko/infrastructure/llm/chat_adapter.py",
+      "line": 59,
+      "literal": "type",
+      "reason": "Parsing Anthropic API response structure (external contract)"
+    },
+    {
+      "file": "backend/src/ekko/presentation/graphql/extensions.py",
+      "line": 55,
+      "literal": "name",
+      "reason": "Accessing GraphQL operation attribute via getattr fallback"
+    },
+    {
+      "file": "backend/src/ekko/presentation/graphql/extensions.py",
+      "line": 65,
+      "literal": "request_id",
+      "reason": "FastAPI request.state attribute access (framework pattern)"
+    },
+    {
+      "file": "backend/src/ekko/presentation/graphql/permissions.py",
+      "line": 20,
+      "literal": "user",
+      "reason": "FastAPI request.state attribute access (framework pattern)"
+    },
+    {
+      "file": "backend/src/ekko/ai/chains/conversational.py",
+      "line": 49,
+      "literal": "role",
+      "reason": "Message history dict structure - TODO: extract to constants"
+    },
+    {
+      "file": "backend/src/ekko/ai/chains/conversational.py",
+      "line": 49,
+      "literal": "content",
+      "reason": "Message history dict structure - TODO: extract to constants"
+    },
+    {
+      "file": "backend/src/ekko/ai/chains/conversational.py",
+      "line": 34,
+      "literal": "role",
+      "reason": "Message history dict structure - TODO: extract to constants"
+    },
+    {
+      "file": "backend/src/ekko/ai/chains/conversational.py",
+      "line": 34,
+      "literal": "content",
+      "reason": "Message history dict structure - TODO: extract to constants"
+    },
+    {
+      "file": "backend/src/ekko/presentation/graphql/types.py",
+      "line": 122,
+      "literal": "user",
+      "reason": "Strawberry GraphQL schema requires literal default - framework limitation"
+    },
+    {
+      "file": "backend/src/ekko/composition/app_factory.py",
+      "line": 233,
+      "literal": "/openapi.json",
+      "reason": "FastAPI framework default - TODO: consider extracting to registry"
+    },
+    {
+      "file": "backend/src/ekko/composition/app_factory.py",
+      "line": 234,
+      "literal": "/docs",
+      "reason": "FastAPI framework default - TODO: consider extracting to registry"
+    },
+    {
+      "file": "backend/src/ekko/composition/app_factory.py",
+      "line": 235,
+      "literal": "/redoc",
+      "reason": "FastAPI framework default - TODO: consider extracting to registry"
+    },
+    {
+      "file": "backend/src/ekko/composition/app_factory.py",
+      "line": 252,
+      "literal": "/graphql",
+      "reason": "GraphQL endpoint path - TODO: extract to registry"
+    },
+    {
+      "file": "backend/src/ekko/presentation/api/middleware/authentication.py",
+      "line": 21,
+      "literal": "/health",
+      "reason": "Public path whitelist - TODO: use registry constants"
+    },
+    {
+      "file": "backend/src/ekko/presentation/api/middleware/authentication.py",
+      "line": 21,
+      "literal": "/docs",
+      "reason": "Public path whitelist - TODO: use registry constants"
+    },
+    {
+      "file": "backend/src/ekko/presentation/api/middleware/authentication.py",
+      "line": 21,
+      "literal": "/openapi.json",
+      "reason": "Public path whitelist - TODO: use registry constants"
+    },
+    {
+      "file": "backend/src/ekko/presentation/api/middleware/authentication.py",
+      "line": 21,
+      "literal": "/redoc",
+      "reason": "Public path whitelist - TODO: use registry constants"
+    },
+    {
+      "file": "backend/src/ekko/presentation/api/routes/health.py",
+      "line": 13,
+      "literal": "/health",
+      "reason": "Route definition - TODO: extract to registry"
+    },
+    {
+      "file": "backend/src/ekko/presentation/api/routes/stream.py",
+      "line": 12,
+      "literal": "/start_stream",
+      "reason": "Route definition - TODO: extract to registry"
+    },
+    {
+      "file": "backend/src/ekko/presentation/api/routes/stream.py",
+      "line": 20,
+      "literal": "/pause_stream",
+      "reason": "Route definition - TODO: extract to registry"
+    },
+    {
+      "file": "backend/src/ekko/presentation/graphql/router.py",
+      "line": 39,
+      "literal": "/graphql",
+      "reason": "GraphQL route definition - TODO: extract to registry"
+    },
+    {
+      "file": "backend/src/ekko/presentation/graphql/types.py",
+      "line": 94,
+      "literal": "active",
+      "reason": "Status enum value definition - TODO: migrate to core.enums"
+    }
+  ]
+}

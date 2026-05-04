@@ -1,4 +1,4 @@
-"""AI-related enums (LLM, STT providers and models)."""
+"""AI-related enums (STT providers)."""
 
 from __future__ import annotations
 
@@ -8,25 +8,9 @@ from ekko.core.enums.base import ParseableEnum
 
 
 @unique
-class LLMProvider(ParseableEnum):
-    OPENAI = auto()
-    AZURE_OPENAI = auto()
-    ANTHROPIC = auto()
-    COHERE = auto()
-    GOOGLE = auto()
-    OTHER = auto()
-
-
-@unique
-class ChatModel(ParseableEnum):
-    GPT_3_5_TURBO = "gpt-3.5-turbo"
-    GPT_4 = "gpt-4"
-    GPT_4O = "gpt-4o"
-    GPT_5 = "gpt-5"
-
-
-@unique
 class STTProvider(ParseableEnum):
+    """Speech-to-text provider options."""
+
     WHISPER = auto()
     FASTER_WHISPER = auto()
     AZURE_SPEECH = auto()
@@ -34,4 +18,4 @@ class STTProvider(ParseableEnum):
     OTHER = auto()
 
 
-__all__ = ["ChatModel", "LLMProvider", "STTProvider"]
+__all__ = ["STTProvider"]

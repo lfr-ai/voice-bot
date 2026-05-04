@@ -1,0 +1,147 @@
+# Dependabot configuration for Ekko
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+
+updates:
+  # ═══════════════════════════════════════════════════════════
+  # Python (uv) - Backend Dependencies
+  # ═══════════════════════════════════════════════════════════
+  - package-ecosystem: "pip"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Copenhagen"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "lauritsfromberg"
+    assignees:
+      - "lauritsfromberg"
+    labels:
+      - "dependencies"
+      - "backend"
+      - "python"
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+      include: "scope"
+    # Group minor and patch updates
+    groups:
+      fastapi-ecosystem:
+        patterns:
+          - "fastapi*"
+          - "uvicorn*"
+          - "starlette*"
+          - "pydantic*"
+      sqlalchemy-ecosystem:
+        patterns:
+          - "sqlalchemy*"
+          - "alembic*"
+          - "aiosqlite*"
+      langchain-ecosystem:
+        patterns:
+          - "langchain*"
+      testing:
+        patterns:
+          - "pytest*"
+          - "hypothesis*"
+          - "factory-boy*"
+      linting:
+        patterns:
+          - "ruff*"
+          - "ty*"
+          - "bandit*"
+
+  # ═══════════════════════════════════════════════════════════
+  # JavaScript (bun) - Frontend Dependencies
+  # ═══════════════════════════════════════════════════════════
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Copenhagen"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "lauritsfromberg"
+    assignees:
+      - "lauritsfromberg"
+    labels:
+      - "dependencies"
+      - "frontend"
+      - "javascript"
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+      include: "scope"
+    # Group minor and patch updates
+    groups:
+      react-ecosystem:
+        patterns:
+          - "react*"
+          - "@vitejs/*"
+      ui-components:
+        patterns:
+          - "@radix-ui/*"
+          - "lucide-react*"
+          - "tailwindcss*"
+      testing:
+        patterns:
+          - "@testing-library/*"
+          - "vitest*"
+          - "@playwright/*"
+      linting:
+        patterns:
+          - "@biomejs/*"
+          - "eslint*"
+
+  # ═══════════════════════════════════════════════════════════
+  # GitHub Actions
+  # ═══════════════════════════════════════════════════════════
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Copenhagen"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "lauritsfromberg"
+    assignees:
+      - "lauritsfromberg"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
+  # ═══════════════════════════════════════════════════════════
+  # Docker
+  # ═══════════════════════════════════════════════════════════
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Copenhagen"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "lauritsfromberg"
+    assignees:
+      - "lauritsfromberg"
+    labels:
+      - "dependencies"
+      - "docker"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"

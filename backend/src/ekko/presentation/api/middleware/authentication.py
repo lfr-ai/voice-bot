@@ -12,13 +12,15 @@ from typing import TYPE_CHECKING, final
 
 from starlette.middleware.base import BaseHTTPMiddleware
 
+from ekko.core.registry_constants import ROUTE_DOCS, ROUTE_HEALTH, ROUTE_OPENAPI_JSON, ROUTE_REDOC
+
 if TYPE_CHECKING:
     from starlette.requests import Request
     from starlette.responses import Response
 
 logger = logging.getLogger(__name__)
 
-_PUBLIC_PATHS = frozenset({"/health", "/docs", "/openapi.json", "/redoc"})
+_PUBLIC_PATHS = frozenset({ROUTE_HEALTH, ROUTE_DOCS, ROUTE_OPENAPI_JSON, ROUTE_REDOC})
 
 
 @dataclass(frozen=True, slots=True)

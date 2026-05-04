@@ -41,5 +41,29 @@
     "completed": {"label": "Completed", "description": "Transcription finished"},
     "failed": {"label": "Failed", "description": "Transcription failed"},
     "cancelled": {"label": "Cancelled", "description": "Transcription was cancelled"}
+  },
+  "field_names": {
+    "role": {"value": "role", "description": "Message role field in dict structures"},
+    "content": {"value": "content", "description": "Message content field"},
+    "email": {"value": "email", "description": "Email address field"},
+    "name": {"value": "name", "description": "Name field (generic)"},
+    "type": {"value": "type", "description": "Type discriminator field"},
+    "request_id": {"value": "request_id", "description": "Request identifier field"},
+    "user": {"value": "user", "description": "User field in state/context"}
+  },
+  "api_routes": {
+    "health": {"value": "/health", "description": "Health check endpoint"},
+    "docs": {"value": "/docs", "description": "Swagger UI documentation"},
+    "openapi_json": {"value": "/openapi.json", "description": "OpenAPI schema JSON"},
+    "redoc": {"value": "/redoc", "description": "ReDoc documentation"},
+    "graphql": {"value": "/graphql", "description": "GraphQL endpoint"},
+    "start_stream": {"value": "/start_stream", "description": "Start audio streaming"},
+    "pause_stream": {"value": "/pause_stream", "description": "Pause audio streaming"}
+  },
+  "error_codes": {
+    "value_error_missing": {"value": "value_error.missing", "description": "Required value is missing"}
+  },
+  "status_values": {
+    "active": {"value": "active", "description": "Active status"}
   }
 }

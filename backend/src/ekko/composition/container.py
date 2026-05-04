@@ -59,10 +59,10 @@ class Container:
     def stt_service(self) -> STTService:
         """Lazily build the STT service."""
         from ekko.infrastructure.adapters.stt_adapter import (
-            create_faster_whisper_stt,
+            create_azure_speech_stt,
         )
 
-        return create_faster_whisper_stt(settings=self.settings)
+        return create_azure_speech_stt(settings=self.settings)
 
     # ── Audio ────────────────────────────────────────────────
     @cached_property

@@ -116,20 +116,58 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check architecture boundaries
+        run: python tools/security/check_architecture_boundaries.py
+
+      - name: Report results
+        if: always()
+        run: |
+          echo "### Clean Architecture Boundary Check" >> $GITHUB_STEP_SUMMARY
+          echo "Architecture boundary enforcement completed." >> $GITHUB_STEP_SUMMARY
+
+  magic-strings:
+    name: Magic string constants check
+    runs-on: ubuntu-latest
+    needs: lint-and-test
+    timeout-minutes: 10
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
       - name: Install ripgrep
         run: sudo apt-get update && sudo apt-get install -y ripgrep
 
-      - name: Check import boundaries
+      - name: Check magic strings
+        id: magic-strings-check
         run: |
-          if rg "from\s+ekko\.(application|infrastructure|presentation)" backend/src/ekko/core -n; then
-            echo "::error::Found outward imports from core layer.";
-            exit 1;
+          python tools/conventions/check_magic_strings.py > magic_strings_output.txt 2>&1
+          exit_code=$?
+          cat magic_strings_output.txt
+          echo "exit_code=$exit_code" >> $GITHUB_OUTPUT
+          exit $exit_code
+
+      - name: Report results
+        if: always()
+        run: |
+          echo "### Magic String Constants Check" >> $GITHUB_STEP_SUMMARY
+          if [ -f magic_strings_output.txt ]; then
+            violation_count=$(grep -c "violation" magic_strings_output.txt || echo "0")
+            echo "Violations found: $violation_count" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "See job output for detailed violation report." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "Check completed successfully." >> $GITHUB_STEP_SUMMARY
           fi
-          if rg "from\s+ekko\.infrastructure" backend/src/ekko/application -n; then
-            echo "::error::Found direct infrastructure imports in application layer.";
-            exit 1;
-          fi
-          echo "Clean Architecture import boundaries OK"
 
   links:
     name: Check links

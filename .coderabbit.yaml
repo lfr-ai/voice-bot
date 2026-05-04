@@ -1,86 +1,181 @@
-# .coderabbit.yaml — CodeRabbit AI Code Review Configuration
-# Docs: https://docs.coderabbit.ai/guides/configuration
+# CodeRabbit configuration for Ekko
+# https://docs.coderabbit.ai/guides/configure-coderabbit/
 
-language: en-US
+language: "en-US"
+early_access: true
+enable_free_tier: true
 
 reviews:
-  auto_review:
-    enabled: true
-    drafts: false
-
-  request_changes_workflow: false
-  profile: assertive
-
-  instructions: |
-    This project follows strict Clean Architecture with dependency direction:
-    core -> utils -> config -> infrastructure -> application -> composition -> presentation.
-    No use of `Any` in type annotations. Use `BaseDict`/`JSONDict` instead of bare dict.
-    All dataclasses must use frozen=True, slots=True (except Container).
-    Use structlog for logging, never print(). Use keyword-only args (*) for 3+ params.
-    Always chain exceptions: raise NewError(...) from original_error.
-    Use Final[type] for module-level constants.
-
+  # Request changes workflow
+  request_changes_workflow: true
+  
+  # High-level summary
+  high_level_summary: true
+  
+  # Poem style for summaries
+  poem: false
+  
+  # Review status comment
+  review_status_comment: true
+  
+  # Collapse walkthrough
+  collapse_walkthrough: false
+  
+  # Path-based review instructions
   path_instructions:
     - path: "backend/src/ekko/core/**"
       instructions: |
-        Domain core layer (Clean Architecture). Must have ZERO framework imports.
-        No SQLAlchemy, no FastAPI, no LangChain. Only stdlib, utils, and config imports.
-        All classes should use @dataclass(frozen=True, slots=True).
-        No use of `Any` in type annotations.
-
-    - path: "backend/src/ekko/presentation/**"
-      instructions: |
-        Outermost layer (Clean Architecture). May import from application, core,
-        config, and utils. Use fastapi.status constants instead of raw HTTP integers.
-        Use structlog, never print().
-
-    - path: "backend/src/ekko/infrastructure/**"
-      instructions: |
-        Infrastructure layer. May import from core, config, utils, and external libs.
-        Must NOT import from presentation or application layers.
-
+        This is the Core domain layer in Clean Architecture. Review for:
+        - No outward dependencies (must not import from application, presentation, or infrastructure)
+        - Pure domain logic without framework coupling
+        - Immutable value objects and entities
+        - Protocol-based interfaces (ports)
+        - Business rule validation
+    
     - path: "backend/src/ekko/application/**"
       instructions: |
-        Application layer. May import from core, infrastructure, ai, config, utils.
-        Must NOT import from presentation layer.
-
-    - path: "backend/src/ekko/ai/**"
+        This is the Application layer (use cases). Review for:
+        - Depends only on core layer
+        - Orchestrates domain logic
+        - No direct framework dependencies
+        - DTOs for data transfer
+        - Transaction boundaries
+    
+    - path: "backend/src/ekko/infrastructure/**"
       instructions: |
-        AI vertical layer. May import from core, config, utils only.
-        Must NOT import from application, infrastructure, or presentation.
-
+        This is the Infrastructure layer (adapters). Review for:
+        - Implements core interfaces
+        - External integrations (database, APIs, file system)
+        - Framework-specific code allowed here
+        - Must not depend on presentation or application layers
+    
+    - path: "backend/src/ekko/presentation/**"
+      instructions: |
+        This is the Presentation layer (API, GraphQL). Review for:
+        - FastAPI routes and GraphQL schemas
+        - Request/response validation
+        - Depends on application and core
+        - No business logic (delegate to application layer)
+    
+    - path: "backend/tests/**"
+      instructions: |
+        Review test code for:
+        - Proper test isolation
+        - Factory-based test data (factory-boy)
+        - Appropriate test markers (unit, integration, e2e, property, performance)
+        - Mock external dependencies
+        - Clear test naming and documentation
+    
     - path: "frontend/src/**"
       instructions: |
-        React 19 + TypeScript frontend. Uses Vite, shadcn/ui, Tailwind CSS v4,
-        Zustand for state, TanStack React Query. Follow Clean Architecture with
-        domain/application/infrastructure/presentation layers.
+        Review frontend code for:
+        - React 19 best practices
+        - TypeScript strict mode compliance
+        - shadcn/ui component patterns
+        - Proper state management
+        - Accessibility (a11y) standards
+        - Performance optimizations
 
-    - path: "tests/**"
-      instructions: |
-        Test files. Must use pytest markers (@pytest.mark.unit, @pytest.mark.integration).
-        Use factory-boy for test data. Use hypothesis for property-based tests.
-
-  tools:
-    ruff:
-      enabled: true
-    biome:
-      enabled: true
-    markdownlint:
-      enabled: true
-    shellcheck:
-      enabled: true
-
+# Chat configuration
 chat:
+  # Auto-reply to comments
   auto_reply: true
 
-path_filters:
-  - "!**/*.lock"
-  - "!**/bun.lock"
-  - "!**/*.min.js"
-  - "!**/*.min.css"
-  - "!**/dist/**"
-  - "!**/node_modules/**"
-  - "!**/__pycache__/**"
-  - "!**/*.pyc"
-  - "!**/migrations/versions/**"
-  - "!backend/src/ekko/core/registry_constants.py"
+# Knowledge base for project-specific context
+knowledge_base:
+  # Opt in to knowledge base learning
+  learnings: true
+  
+  # Custom learnings
+  custom:
+    - "This project follows Clean Architecture with strict layer boundaries"
+    - "Core layer MUST NOT import from outer layers (application, presentation, infrastructure)"
+    - "Use Pydantic v2 with Annotated + Field for validation"
+    - "Use structlog for logging, never print()"
+    - "All functions must have full type hints"
+    - "Use keyword-only args with * separator for 3+ parameters"
+    - "Exception chaining: raise NewError(...) from original_error"
+    - "Registry constants from registry/naming_registry.json are single source of truth"
+    - "Frontend uses React 19 + Vite + shadcn/ui + TypeScript strict mode"
+    - "Backend uses Python 3.12 + FastAPI + SQLAlchemy 2.0 async + Pydantic v2"
+    - "Testing: pytest for backend, Vitest for frontend, Playwright for E2E"
+    - "Audio pipeline: System/mic → TCP server → Azure Speech Services STT"
+
+# Tone configuration
+tone_instructions: |
+  Provide constructive, friendly, and educational code reviews. 
+  Focus on:
+  - Architecture and design patterns
+  - Security vulnerabilities
+  - Performance optimizations
+  - Readability and maintainability
+  - Test coverage gaps
+  - Documentation improvements
+  
+  Be specific with examples and suggest improvements rather than just pointing out issues.
+
+# Tools configuration
+tools:
+  # GitHub Checks integration
+  github_checks:
+    enable: true
+    auto_review: true
+    timeout: 600
+  
+  # Codebase verification
+  ruff: 
+    enabled: true
+  
+  shellcheck:
+    enabled: true
+  
+  actionlint:
+    enabled: true
+  
+  markdownlint:
+    enabled: true
+
+# PR configuration
+pull_requests:
+  # Auto-review all PRs
+  auto_review: true
+  
+  # Review only touched files
+  review_only_changed_files: true
+  
+  # Ignore patterns
+  ignore_patterns:
+    - "**/*.lock"
+    - "**/*.min.js"
+    - "**/*.min.css"
+    - "**/node_modules/**"
+    - "**/.venv/**"
+    - "**/dist/**"
+    - "**/build/**"
+    - "**/__pycache__/**"
+    - "**/.pytest_cache/**"
+    - "**/.ruff_cache/**"
+
+# Commit configuration  
+commits:
+  # Auto-review commits
+  auto_review: false
+
+# Code of conduct check
+code_of_conduct:
+  enabled: true
+
+# Automatically apply suggested fixes
+auto_apply_suggestions:
+  enabled: false
+  
+# Label configuration
+labels:
+  coderabbit:
+    - "ai-review"
+  
+  changes_requested:
+    - "needs-revision"
+  
+  approved:
+    - "lgtm"

@@ -12,6 +12,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, final
 
+from ekko.core.registry_constants import FIELD_ROLE
+
 logger = logging.getLogger(__name__)
 
 _CONFIG_DIR = Path(__file__).parent / "config"
@@ -61,7 +63,7 @@ class YAMLConfigLoader:
         agents = {}
         for key, cfg in raw.items():
             agents[key] = AgentConfig(
-                role=cfg["role"],
+                role=cfg[FIELD_ROLE],
                 goal=cfg["goal"],
                 backstory=cfg["backstory"],
                 verbose=cfg.get("verbose", False),
@@ -102,7 +104,7 @@ class YAMLConfigLoader:
 
 _AGENT_KNOWN_KEYS = frozenset(
     {
-        "role",
+        FIELD_ROLE,
         "goal",
         "backstory",
         "verbose",

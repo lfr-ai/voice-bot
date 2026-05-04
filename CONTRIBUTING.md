@@ -38,6 +38,70 @@ task db:migrate
 
 > **Note**: This repository is standardized on `uv` for Python dependency management. PDM is not part of the supported contributor workflow.
 
+## Pre-Commit Hooks
+
+Pre-commit hooks provide fast local feedback before you commit changes. They are automatically installed when you run `task install`.
+
+### Manual Installation
+
+If hooks are not yet installed:
+
+```bash
+pre-commit install
+```
+
+### What Gets Checked
+
+The project enforces several quality gates at commit time:
+
+**Pre-Commit Stage** (runs on `git commit`):
+- Code formatting (ruff, biome)
+- Linting (ruff, yamllint, markdownlint)
+- Type checking (ty)
+- Security scanning (detect-secrets, bandit)
+- **Architecture boundary validation** - Ensures Clean Architecture dependencies flow inward
+- Conventional commit message format
+
+**Pre-Push Stage** (runs on `git push`):
+- **Magic string detection** - Flags hardcoded strings that should be constants
+- Unit test suite
+- Integration checks
+
+### Running Hooks Manually
+
+```bash
+# Run all hooks on all files
+pre-commit run --all-files
+
+# Run specific hook
+pre-commit run check-architecture-boundaries --all-files
+pre-commit run check-magic-strings --all-files --hook-stage pre-push
+
+# Run hooks on staged files only
+pre-commit run
+```
+
+### Hook Descriptions
+
+- **check-architecture-boundaries**: Validates Clean Architecture import boundaries. Blocks commits with violations like `core/` importing from `presentation/` or `application/` importing from `infrastructure/`. Fast (< 3 seconds).
+
+- **check-magic-strings**: Detects hardcoded strings that should be extracted to constants or registry. Runs at pre-push stage to allow work-in-progress commits. Provides verbose output with suggested fixes.
+
+### Handling Violations
+
+When a hook fails:
+1. Read the error message - it shows the file, line, and reason
+2. Fix the violation before committing
+3. Run the hook again to verify the fix
+4. Commit your changes
+
+If you need to temporarily skip hooks (emergencies only):
+```bash
+git commit --no-verify
+```
+
+**Warning**: Skipping hooks may cause CI failures. Use only when you understand the risk.
+
 ## Pre-Push Validation
 
 **Always run `task verify` before pushing** to catch CI failures early.

@@ -1,7 +1,7 @@
 """Local development configuration."""
 
+from ekko.config.enums import Environment
 from ekko.config.settings.base import BaseAppConfig
-from ekko.core.enums import Environment
 
 
 class LocalConfig(BaseAppConfig):

@@ -5,12 +5,13 @@ from __future__ import annotations
 from fastapi import APIRouter, Request
 
 from ekko.core.enums import QueueName
+from ekko.core.registry_constants import ROUTE_HEALTH
 from ekko.presentation.api.schemas.responses import HealthResponse
 
 router = APIRouter(tags=["health"])
 
 
-@router.get("/health", response_model=HealthResponse)
+@router.get(ROUTE_HEALTH, response_model=HealthResponse)
 async def health(request: Request) -> HealthResponse:
     """Lightweight health check reporting TCP servers and queue status."""
     state = getattr(request.app, "state", None)

@@ -119,6 +119,24 @@ repos:
   # -- Local hooks ---------------------------------------------------------
   - repo: local
     hooks:
+      # Architecture and code quality enforcement
+      - id: check-architecture-boundaries
+        name: Check Clean Architecture boundaries
+        entry: python tools/security/check_architecture_boundaries.py
+        language: system
+        pass_filenames: false
+        types: [python]
+        # Runs at pre-commit stage to block commits with violations
+
+      - id: check-magic-strings
+        name: Check for magic strings
+        entry: python tools/conventions/check_magic_strings.py --verbose
+        language: system
+        pass_filenames: false
+        types: [python]
+        stages: [pre-push]
+        # Runs at pre-push stage to allow local work-in-progress
+
       - id: ty-check
         name: ty type check
         entry: bash -c 'cd backend && uv tool run ty check src/ekko'
