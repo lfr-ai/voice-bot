@@ -2,11 +2,14 @@
 ---
 version: "3"
 
+vars:
+  BACKEND_PYTHONPATH: '{{if eq OS "windows"}}src;..{{else}}src:..{{end}}'
+
 tasks:
   dev:
     desc: "Run FastAPI app in reload mode"
     env:
-      PYTHONPATH: "/workspace/backend/src"
+      PYTHONPATH: "{{.BACKEND_PYTHONPATH}}"
       EKKO_DISABLE_AUDIO: "{{.EKKO_DISABLE_AUDIO | default \"false\"}}"
     cmds:
       - uv run uvicorn ekko.composition.app_factory:create_app --factory --reload --host 127.0.0.1 --port 8000
@@ -24,36 +27,50 @@ tasks:
   # ── Testing ──────────────────────────────────────────────────
   test:
     desc: "Run full backend test suite"
+    env:
+      PYTHONPATH: "{{.BACKEND_PYTHONPATH}}"
     cmds:
       - uv run python -m pytest ../tests/ -v --tb=short {{.CLI_ARGS}}
 
   test:unit:
     desc: "Run unit tests only"
+    env:
+      PYTHONPATH: "{{.BACKEND_PYTHONPATH}}"
     cmds:
       - uv run python -m pytest ../tests/unit/ -v --tb=short {{.CLI_ARGS}}
 
   test:integration:
     desc: "Run integration tests"
+    env:
+      PYTHONPATH: "{{.BACKEND_PYTHONPATH}}"
     cmds:
       - uv run python -m pytest ../tests/integration/ -v --tb=short -m integration {{.CLI_ARGS}}
 
   test:property:
     desc: "Run property-based tests"
+    env:
+      PYTHONPATH: "{{.BACKEND_PYTHONPATH}}"
     cmds:
       - uv run python -m pytest ../tests/property/ -v --tb=short {{.CLI_ARGS}}
 
   test:performance:
     desc: "Run performance benchmarks"
+    env:
+      PYTHONPATH: "{{.BACKEND_PYTHONPATH}}"
     cmds:
       - uv run python -m pytest ../tests/performance/ -v --benchmark-only {{.CLI_ARGS}}
 
   test:e2e:
     desc: "Run end-to-end tests"
+    env:
+      PYTHONPATH: "{{.BACKEND_PYTHONPATH}}"
     cmds:
       - uv run python -m pytest ../tests/e2e/ -v --tb=short {{.CLI_ARGS}}
 
   test:coverage:
     desc: "Run tests with coverage report"
+    env:
+      PYTHONPATH: "{{.BACKEND_PYTHONPATH}}"
     cmds:
       - uv run python -m pytest ../tests/ --cov=src/ekko --cov-report=term-missing --cov-report=html {{.CLI_ARGS}}
 

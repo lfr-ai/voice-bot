@@ -11,6 +11,7 @@ Tests the Strawberry GraphQL schema including:
 
 from __future__ import annotations
 
+import asyncio
 from unittest.mock import AsyncMock, Mock
 
 import pytest
@@ -43,6 +44,14 @@ from ekko.presentation.graphql.extensions import (
 )
 from ekko.presentation.graphql.schema import schema
 
+
+def _execute_sync_compat(*args: object, **kwargs: object) -> object:
+    """Compatibility shim for async Strawberry schema execution in sync tests."""
+    return asyncio.run(schema.execute(*args, **kwargs))
+
+
+schema.execute_sync = _execute_sync_compat  # type: ignore[method-assign]
+
 # ── Schema Structure Tests ───────────────────────────────────
 
 
@@ -67,16 +76,19 @@ class TestGraphQLSchemaStructure:
 
     def test_schema_has_required_extensions(self) -> None:
         """Schema includes security and performance extensions."""
-        extension_types = [type(ext) for ext in schema.extensions]
+        extension_names = {
+            ext.__name__ if isinstance(ext, type) else type(ext).__name__
+            for ext in schema.extensions
+        }
 
-        assert ParserCache in extension_types
-        assert ValidationCache in extension_types
-        assert QueryDepthLimiter in extension_types
-        assert MaxAliasesLimiter in extension_types
-        assert MaxTokensLimiter in extension_types
-        assert QueryTimingExtension in extension_types
-        assert RequestContextExtension in extension_types
-        assert SessionLifecycleExtension in extension_types
+        assert ParserCache.__name__ in extension_names
+        assert ValidationCache.__name__ in extension_names
+        assert QueryDepthLimiter.__name__ in extension_names
+        assert MaxAliasesLimiter.__name__ in extension_names
+        assert MaxTokensLimiter.__name__ in extension_names
+        assert QueryTimingExtension.__name__ in extension_names
+        assert RequestContextExtension.__name__ in extension_names
+        assert SessionLifecycleExtension.__name__ in extension_names
 
     def test_query_fields_exist(self) -> None:
         """Query type exposes expected fields."""

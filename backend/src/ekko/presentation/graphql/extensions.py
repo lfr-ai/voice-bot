@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import asyncio
+import inspect
 import logging
 import time
 from typing import TYPE_CHECKING
@@ -9,7 +11,7 @@ from typing import TYPE_CHECKING
 from strawberry.extensions import SchemaExtension
 
 if TYPE_CHECKING:
-    from collections.abc import AsyncGenerator
+    from collections.abc import Generator
 
 logger = logging.getLogger(__name__)
 
@@ -23,31 +25,45 @@ class SessionLifecycleExtension(SchemaExtension):
     extension free from infrastructure imports.
     """
 
-    async def on_operation(self) -> AsyncGenerator[None, None]:
+    def on_operation(self) -> Generator[None, None, None]:
+        context = self.execution_context.context
+        if context is None:
+            context = {}
+            self.execution_context.context = context
+
         session = None
         try:
-            session_factory = self.execution_context.context.get("session_factory")
+            session_factory = context.get("session_factory")
             if session_factory is not None:
                 session = session_factory()
-                self.execution_context.context["db_session"] = session
+                context["db_session"] = session
             else:
                 logger.debug("No session_factory in context; skipping DB session setup")
-                self.execution_context.context["db_session"] = None
+                context["db_session"] = None
         except Exception:
             logger.debug("DB session not available (database may not be configured)")
-            self.execution_context.context["db_session"] = None
+            context["db_session"] = None
 
         try:
             yield
         finally:
             if session is not None:
-                await session.close()
+                close_result = session.close()
+                if inspect.isawaitable(close_result):
+                    try:
+                        running_loop = asyncio.get_running_loop()
+                    except RuntimeError:
+                        asyncio.run(close_result)
+                    else:
+                        self._pending_close_task = running_loop.create_task(
+                            close_result
+                        )
 
 
 class QueryTimingExtension(SchemaExtension):
     """Log execution time for each GraphQL operation."""
 
-    async def on_operation(self) -> AsyncGenerator[None, None]:
+    def on_operation(self) -> Generator[None, None, None]:
         start = time.monotonic()
         yield
         elapsed = time.monotonic() - start
@@ -59,8 +75,13 @@ class QueryTimingExtension(SchemaExtension):
 class RequestContextExtension(SchemaExtension):
     """Inject request metadata into the GraphQL context."""
 
-    async def on_operation(self) -> AsyncGenerator[None, None]:
-        request = self.execution_context.context.get("request")
+    def on_operation(self) -> Generator[None, None, None]:
+        context = self.execution_context.context
+        if context is None:
+            context = {}
+            self.execution_context.context = context
+
+        request = context.get("request")
         if request:
-            self.execution_context.context["request_id"] = getattr(request.state, "request_id", None)
+            context["request_id"] = getattr(request.state, "request_id", None)
         yield

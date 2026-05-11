@@ -1,3 +1,5 @@
+# ruff: noqa: I001
+
 """Property-based tests for the naming registry.
 
 Validates invariants that must hold for all registry entries:
@@ -14,13 +16,9 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
-from typing import TYPE_CHECKING
 
-import pytest
 from hypothesis import given, strategies as st
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
+import pytest
 
 # ── Constants ───────────────────────────────────────────────────
 
@@ -98,9 +96,11 @@ def test_valid_key_format(registry: dict) -> None:
     """
     invalid_keys: list[tuple[str, str]] = []
     for section_name, entries in registry.items():
-        for key in entries.keys():
-            if not VALID_KEY_PATTERN.match(key):
-                invalid_keys.append((section_name, key))
+        invalid_keys.extend(
+            (section_name, key)
+            for key in entries
+            if not VALID_KEY_PATTERN.match(key)
+        )
 
     assert not invalid_keys, (
         f"Invalid key format (must match [a-z0-9_]+): {invalid_keys}"
@@ -127,7 +127,7 @@ def test_required_fields_present(registry: dict) -> None:
 def test_section_names_valid(registry: dict) -> None:
     """Section names match the pattern [a-z0-9_]+."""
     invalid_sections = [
-        section for section in registry.keys() if not VALID_KEY_PATTERN.match(section)
+        section for section in registry if not VALID_KEY_PATTERN.match(section)
     ]
     assert not invalid_sections, f"Invalid section names: {invalid_sections}"
 
@@ -154,7 +154,7 @@ def test_hypothetical_key_format(key: str) -> None:
         unique=True,
     )
 )
-def test_uniqueness_property(labels: Sequence[str]) -> None:
+def test_uniqueness_property(labels: list[str]) -> None:
     """Unique input labels remain unique after set conversion.
 
     Validates that uniqueness checks work correctly for any list of labels.

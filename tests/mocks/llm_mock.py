@@ -19,12 +19,13 @@ class MockLLMAdapter:
         system_prompt: str,
         user_prompt: str,
         *,
-        _deployment_name: str,
-        _max_completion_tokens: int = 1024,
-        _temperature: float = 0.0,
-        **_kwargs: Any,
+        deployment_name: str,
+        max_completion_tokens: int = 1024,
+        temperature: float = 0.0,
+        **kwargs: Any,
     ) -> str:
         """Return mock response."""
+        _ = (deployment_name, max_completion_tokens, temperature, kwargs)
         self.call_count += 1
         self.last_system_prompt = system_prompt
         self.last_user_prompt = user_prompt
@@ -35,12 +36,13 @@ class MockLLMAdapter:
         system_prompt: str,
         user_prompt: str,
         *,
-        _deployment_name: str,
-        _max_completion_tokens: int = 1024,
-        _temperature: float = 0.0,
-        **_kwargs: Any,
+        deployment_name: str,
+        max_completion_tokens: int = 1024,
+        temperature: float = 0.0,
+        **kwargs: Any,
     ) -> str:
         """Return mock response asynchronously."""
+        _ = (deployment_name, max_completion_tokens, temperature, kwargs)
         self.call_count += 1
         self.last_system_prompt = system_prompt
         self.last_user_prompt = user_prompt
@@ -52,26 +54,42 @@ class FailingLLMAdapter(MockLLMAdapter):
 
     def chat(
         self,
-        _system_prompt: str,
-        _user_prompt: str,
+        system_prompt: str,
+        user_prompt: str,
         *,
-        _deployment_name: str,
-        _max_completion_tokens: int = 1024,
-        _temperature: float = 0.0,
-        **_kwargs: Any,
+        deployment_name: str,
+        max_completion_tokens: int = 1024,
+        temperature: float = 0.0,
+        **kwargs: Any,
     ) -> str:
         """Simulate LLM failure."""
+        _ = (
+            system_prompt,
+            user_prompt,
+            deployment_name,
+            max_completion_tokens,
+            temperature,
+            kwargs,
+        )
         raise RuntimeError("LLM processing failed")
 
     async def async_chat(
         self,
-        _system_prompt: str,
-        _user_prompt: str,
+        system_prompt: str,
+        user_prompt: str,
         *,
-        _deployment_name: str,
-        _max_completion_tokens: int = 1024,
-        _temperature: float = 0.0,
-        **_kwargs: Any,
+        deployment_name: str,
+        max_completion_tokens: int = 1024,
+        temperature: float = 0.0,
+        **kwargs: Any,
     ) -> str:
         """Simulate async LLM failure."""
+        _ = (
+            system_prompt,
+            user_prompt,
+            deployment_name,
+            max_completion_tokens,
+            temperature,
+            kwargs,
+        )
         raise RuntimeError("LLM processing failed")

@@ -1,3 +1,5 @@
+# ruff: noqa: I001
+
 """Architecture boundary checker tests.
 
 Tests the Clean Architecture boundary enforcement tool including:
@@ -16,6 +18,7 @@ Tests the Clean Architecture boundary enforcement tool including:
 from __future__ import annotations
 
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -27,6 +30,13 @@ from tools.security.check_architecture_boundaries import (
     _check_core,
     _check_infrastructure,
     _check_utils,
+)
+
+ARCHITECTURE_CHECK_SCRIPT = (
+    Path(__file__).resolve().parents[3]
+    / "tools"
+    / "security"
+    / "check_architecture_boundaries.py"
 )
 
 
@@ -477,8 +487,8 @@ class TestCLIBehavior:
         utils_file.parent.mkdir(parents=True)
         utils_file.write_text("from typing import Protocol\n")
 
-        result = subprocess.run(
-            ["python", "tools/security/check_architecture_boundaries.py"],
+        result = subprocess.run(  # noqa: S603
+            [sys.executable, str(ARCHITECTURE_CHECK_SCRIPT)],
             capture_output=True,
             text=True,
             check=False,
@@ -490,8 +500,12 @@ class TestCLIBehavior:
 
     def test_verbose_flag_accepted(self) -> None:
         """Tool accepts --verbose flag without error."""
-        result = subprocess.run(
-            ["python", "tools/security/check_architecture_boundaries.py", "--verbose"],
+        result = subprocess.run(  # noqa: S603
+            [
+                sys.executable,
+                str(ARCHITECTURE_CHECK_SCRIPT),
+                "--verbose",
+            ],
             capture_output=True,
             text=True,
             check=False,
@@ -503,8 +517,8 @@ class TestCLIBehavior:
 
     def test_short_verbose_flag_accepted(self) -> None:
         """Tool accepts -v short flag without error."""
-        result = subprocess.run(
-            ["python", "tools/security/check_architecture_boundaries.py", "-v"],
+        result = subprocess.run(  # noqa: S603
+            [sys.executable, str(ARCHITECTURE_CHECK_SCRIPT), "-v"],
             capture_output=True,
             text=True,
             check=False,

@@ -1,19 +1,20 @@
+# ruff: noqa: I001
+
 """Tests for magic string detection tool."""
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 from textwrap import dedent
 
 import pytest
 
-# Import the module under test
-import sys
-from pathlib import Path as P
-
 # Add tools/conventions to path
-tools_path = P(__file__).resolve().parents[3] / "tools" / "conventions"
+tools_path = Path(__file__).resolve().parents[3] / "tools" / "conventions"
 sys.path.insert(0, str(tools_path))
+
+import check_magic_strings  # noqa: E402
 
 from check_magic_strings import (  # noqa: E402
     FIELD_PATTERNS,
@@ -102,8 +103,6 @@ class TestIsExcludedFile:
         test_file.touch()
 
         # Patch TESTS constant
-        import check_magic_strings
-
         original_tests = check_magic_strings.TESTS
         try:
             check_magic_strings.TESTS = tmp_path / "tests"
