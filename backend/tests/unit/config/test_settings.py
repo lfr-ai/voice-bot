@@ -38,6 +38,11 @@ class TestBaseAppConfig:
         assert cfg.wait_timeout_seconds == 2
         assert cfg.sleep_delay_seconds == 0.1
 
+    def test_duckdb_settings_present(self):
+        cfg = BaseAppConfig()
+        assert isinstance(cfg.duckdb_enabled, bool)
+        assert cfg.duckdb_database_path.endswith(".duckdb")
+
 
 class TestEnvironmentConfigs:
     def test_local_debug_on(self):

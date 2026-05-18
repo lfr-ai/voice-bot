@@ -2,6 +2,14 @@
 
 Backend package for Ekko (FastAPI + Strawberry GraphQL + Clean Architecture).
 
+## DuckDB Migration (existing health checks)
+
+- DuckDB can be enabled for readiness probes over the existing SQLite database.
+- Configure with:
+  - `EKKO_DUCKDB_ENABLED=true|false`
+  - `EKKO_DUCKDB_DATABASE_PATH=./ekko_analytics.duckdb`
+- REST `/health` and GraphQL `healthReady` keep existing behavior and add optional DuckDB probe results when enabled.
+
 ## Testing Notes
 
 - Integration database tests run against PostgreSQL via `testcontainers` (Docker required).

@@ -52,6 +52,10 @@ class BaseAppConfig(BaseSettings):
     # ── Database (SQLite) ─────────────────────────────────────
     database_path: str = "./ekko.db"
 
+    # ── Database (DuckDB analytics over SQLite) ───────────────
+    duckdb_enabled: bool = False
+    duckdb_database_path: str = "./ekko_analytics.duckdb"
+
     # ── Paths ─────────────────────────────────────────────────
     root_dir_path: Path = Path(__file__).resolve().parents[4]
     src_dir_path: Path = root_dir_path / "src"
@@ -97,6 +101,23 @@ class BaseAppConfig(BaseSettings):
             db_path = Path(self.database_path).resolve()
         db_path.parent.mkdir(parents=True, exist_ok=True)
         return db_path
+
+    @cached_property
+    def _resolved_duckdb_path(self) -> Path:
+        """Resolve the DuckDB file path, creating parent dirs as needed."""
+        duckdb_path = Path(self.duckdb_database_path).resolve()
+        duckdb_path.parent.mkdir(parents=True, exist_ok=True)
+        return duckdb_path
+
+    @property
+    def resolved_db_path(self) -> Path:
+        """Public accessor for the resolved SQLite path."""
+        return self._resolved_db_path
+
+    @property
+    def resolved_duckdb_path(self) -> Path:
+        """Public accessor for the resolved DuckDB path."""
+        return self._resolved_duckdb_path
 
     @cached_property
     def database_url(self) -> str:
